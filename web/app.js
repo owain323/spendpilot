@@ -283,19 +283,27 @@ function cardHTML(card) {
         <h3>Cost per 1K tasks</h3>
         ${card.providers.map(r => {
           const last = r.points[r.points.length - 1];
-          const drift = r.drift && r.drift.mom_pct !== null
-            ? `${r.drift.mom_pct > 0 ? "+" : ""}${r.drift.mom_pct}% MoM` : "n/a";
+          const first = r.points[0];
+          const tone = r.canary ? "var(--over)" : "var(--accent)";
+          const windowPct = r.drift && r.drift.since_first_pct !== null
+            ? `${r.drift.since_first_pct > 0 ? "+" : ""}${r.drift.since_first_pct}%`
+            : "n/a";
           return `<div class="unit-row${r.canary ? " unit-canary" : ""}">
             <div class="unit-head">
               <b>${esc(r.provider)}</b>
               ${r.canary ? ' <span class="badge over">canary</span>' : ""}
             </div>
-            <div class="unit-sub">${money(last.cost_per_1k_tasks)} /1K · ${drift} since first month</div>
-            ${svgSparkline(r.points.map(p => ({ v: p.cost_per_1k_tasks })), {
-              hotLast: r.canary,
-              aria: r.provider + " cost per 1K tasks trend",
-            })}
-            ${sparkAxis(r.points[0].month.slice(2), r.points[r.points.length - 1].month.slice(2))}
+            <div class="unit-chart">
+              <span class="spark-val spark-first">${money(first.cost_per_1k_tasks)}</span>
+              ${svgSparkline(r.points.map(p => ({ v: p.cost_per_1k_tasks })), {
+                hotLast: r.canary,
+                aria: r.provider + " cost per 1K tasks trend",
+              })}
+              <span class="spark-val spark-last" style="color:${tone}">${money(last.cost_per_1k_tasks)}</span>
+            </div>
+            <div class="spark-axis"><span>${esc(first.month.slice(2))}</span>
+              <b class="unit-drift" style="color:${tone}">${windowPct}</b>
+              <span>${esc(last.month.slice(2))}</span></div>
           </div>`;
         }).join("")}
         <p class="note">Total spend is the smoke alarm; cost per task is the canary.</p>
