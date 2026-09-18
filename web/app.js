@@ -14,7 +14,19 @@ const statsEl = document.getElementById("stats");
 const pipelineEl = document.getElementById("pipeline");
 
 const SESSION_KEY = "spendpilot.session";
+const SESSION_TOKEN_KEY = "spendpilot.sessionToken";
 let sessionId = localStorage.getItem(SESSION_KEY) || null;
+let sessionToken = localStorage.getItem(SESSION_TOKEN_KEY) || null;
+
+/* The browser mints an authenticated session once; its token approves
+ * actions and pins this browser to its own workspace state file. */
+async function ensureSession() {
+  if (sessionToken) return;
+  const res = await fetch("/api/session", { method: "POST" });
+  const data = await res.json();
+  sessionToken = data.session_token;
+  localStorage.setItem(SESSION_TOKEN_KEY, sessionToken);
+}
 
 function money(v) {
   return "$" + Number(v).toLocaleString("en-US", { minimumFractionDigits: 2 });
@@ -249,7 +261,7 @@ async function post(url, body) {
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ ...body, session_token: sessionToken }),
   });
   return res.json();
 }
@@ -268,7 +280,7 @@ async function send(text) {
 }
 
 async function loadLedger() {
-  const res = await fetch("/api/ledger");
+  const res = await fetch(`/api/ledger?session_token=${encodeURIComponent(sessionToken || "")}`);
   const data = await res.json();
   ledgerBody.innerHTML = data.entries.map(e =>
     `<div class="ledger-entry">
@@ -278,7 +290,9 @@ async function loadLedger() {
 }
 
 async function boot() {
-  const url = "/api/opening" + (sessionId ? `?session_id=${sessionId}` : "");
+  await ensureSession();
+  const url = "/api/opening" + (sessionId ? `?session_id=${sessionId}` : "")
+    + `&session_token=${encodeURIComponent(sessionToken || "")}`;
   const res = await fetch(url);
   const data = await res.json();
   sessionId = data.session_id;

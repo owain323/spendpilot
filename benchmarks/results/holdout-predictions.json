@@ -1,0 +1,238 @@
+[
+  {
+    "case_id": "h01-idle-cloud-spike",
+    "flag": [
+      "spike-northstack"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "spike-northstack": "high"
+    }
+  },
+  {
+    "case_id": "h02-idle-cloud-spike",
+    "flag": [
+      "spike-brightloop"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "spike-brightloop": "high"
+    }
+  },
+  {
+    "case_id": "h03-growth-is-value",
+    "flag": [],
+    "keep": [
+      "keep-vexohost"
+    ],
+    "hold": [],
+    "confidence": {
+      "keep-vexohost": "high"
+    }
+  },
+  {
+    "case_id": "h04-growth-is-value",
+    "flag": [],
+    "keep": [
+      "keep-quanta-ai"
+    ],
+    "hold": [],
+    "confidence": {
+      "keep-quanta-ai": "high"
+    }
+  },
+  {
+    "case_id": "h05-trial-conversion",
+    "flag": [
+      "trial-meshpay"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "trial-meshpay": "medium"
+    }
+  },
+  {
+    "case_id": "h06-trial-conversion",
+    "flag": [
+      "trial-signalhq"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "trial-signalhq": "medium"
+    }
+  },
+  {
+    "case_id": "h07-zombie",
+    "flag": [
+      "zombie-pinegrid"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "zombie-pinegrid": "low"
+    }
+  },
+  {
+    "case_id": "h08-zombie",
+    "flag": [
+      "zombie-orbitml"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "zombie-orbitml": "low"
+    }
+  },
+  {
+    "case_id": "h09-task-drift",
+    "flag": [
+      "taskdrift-cascade-io"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "taskdrift-cascade-io": "high"
+    }
+  },
+  {
+    "case_id": "h10-task-drift",
+    "flag": [
+      "taskdrift-ferrodata"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "taskdrift-ferrodata": "high"
+    }
+  },
+  {
+    "case_id": "h11-insufficient-history",
+    "flag": [],
+    "keep": [],
+    "hold": [
+      "ineligible-lumenapi"
+    ],
+    "confidence": {
+      "ineligible-lumenapi": null
+    }
+  },
+  {
+    "case_id": "h12-insufficient-history",
+    "flag": [],
+    "keep": [],
+    "hold": [
+      "ineligible-stellarpay"
+    ],
+    "confidence": {
+      "ineligible-stellarpay": null
+    }
+  },
+  {
+    "case_id": "h13-small-change-no-alert",
+    "flag": [],
+    "keep": [],
+    "hold": [],
+    "confidence": {}
+  },
+  {
+    "case_id": "h14-small-change-no-alert",
+    "flag": [],
+    "keep": [],
+    "hold": [],
+    "confidence": {}
+  },
+  {
+    "case_id": "h15-small-dollar-spike",
+    "flag": [],
+    "keep": [],
+    "hold": [],
+    "confidence": {}
+  },
+  {
+    "case_id": "h16-small-dollar-spike",
+    "flag": [],
+    "keep": [],
+    "hold": [],
+    "confidence": {}
+  },
+  {
+    "case_id": "h17-multi-provider",
+    "flag": [
+      "spike-cobaltrun",
+      "zombie-emberly"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "spike-cobaltrun": "high",
+      "zombie-emberly": "low"
+    }
+  },
+  {
+    "case_id": "h18-multi-provider",
+    "flag": [
+      "spike-kestrel-ai",
+      "zombie-palisade"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "spike-kestrel-ai": "high",
+      "zombie-palisade": "low"
+    }
+  },
+  {
+    "case_id": "h19-trend-not-spike",
+    "flag": [],
+    "keep": [],
+    "hold": [],
+    "confidence": {}
+  },
+  {
+    "case_id": "h20-trend-not-spike",
+    "flag": [],
+    "keep": [],
+    "hold": [],
+    "confidence": {}
+  },
+  {
+    "case_id": "h21-volume-up-cost-flat",
+    "flag": [],
+    "keep": [],
+    "hold": [],
+    "confidence": {}
+  },
+  {
+    "case_id": "h22-volume-up-cost-flat",
+    "flag": [],
+    "keep": [],
+    "hold": [],
+    "confidence": {}
+  },
+  {
+    "case_id": "h23-strong-spike-confidence",
+    "flag": [
+      "spike-meshpay"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "spike-meshpay": "high"
+    }
+  },
+  {
+    "case_id": "h24-strong-spike-confidence",
+    "flag": [
+      "spike-signalhq"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "spike-signalhq": "high"
+    }
+  }
+]

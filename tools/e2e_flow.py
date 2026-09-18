@@ -74,20 +74,29 @@ def main() -> int:
                 _wait_ready(port, proc, err_path)
             except Exception:
                 proc.kill()
+                proc.wait(timeout=5)  # let Windows release the stderr handle
                 raise
         base = f"http://127.0.0.1:{port}"
+
+        session = json.loads(urllib.request.urlopen(
+            urllib.request.Request(f"{base}/api/session", data=b"{}",
+                                   headers={"Content-Type": "application/json"}),
+            timeout=15).read())
+        token = session["session_token"]
+        print(f"## 0. authenticated session minted (workspace {session['workspace']})")
 
         def post(msg: str, sid: str | None) -> dict:
             req = urllib.request.Request(
                 f"{base}/api/chat",
-                data=json.dumps({"message": msg, "session_id": sid}).encode(),
+                data=json.dumps({"message": msg, "session_id": sid,
+                                  "session_token": token}).encode(),
                 headers={"Content-Type": "application/json"})
             with urllib.request.urlopen(req, timeout=15) as r:
                 return json.loads(r.read())
 
         try:
             # 1. agent speaks first (unprompted)
-            with urllib.request.urlopen(f"{base}/api/opening", timeout=15) as r:
+            with urllib.request.urlopen(f"{base}/api/opening?session_token={token}", timeout=15) as r:
                 opening = json.loads(r.read())
             sid = opening["session_id"]
             print("## 1. agent speaks first (unprompted)")
@@ -133,14 +142,14 @@ def main() -> int:
             assert row["status"] == "warn"
 
             # 7. reopen session -> memory
-            with urllib.request.urlopen(f"{base}/api/opening?session_id={sid}", timeout=15) as r:
+            with urllib.request.urlopen(f"{base}/api/opening?session_id={sid}&session_token={token}", timeout=15) as r:
                 reopen = json.loads(r.read())
             print("\n## 7. reopen session -> memory")
             print("reply:", reopen["reply"])
             assert "remember" in reopen["reply"].lower()
 
             # 8. decision ledger shows the whole loop
-            with urllib.request.urlopen(f"{base}/api/ledger", timeout=15) as r:
+            with urllib.request.urlopen(f"{base}/api/ledger?session_token={token}", timeout=15) as r:
                 trail = json.loads(r.read())
             kinds = [e["kind"] for e in trail["entries"]]
             print("\n## 8. decision ledger")

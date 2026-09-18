@@ -148,28 +148,31 @@ async def _probe(url: str, log) -> None:
             log("[5/8] state over the wire -> set_budget then budget_status agrees; "
                 "error surface returns structured errors")
 
-            # --- the action loop, entirely over the wire --------------------
+            # --- the action boundary, entirely over the wire ----------------
+            # Execution requires a mandate (bearer): a bogus one must refuse.
             refused = await call("execute_action", {"mandate_id": "m-bogus000"})
             assert refused.get("refused") is True, "execution without a mandate must refuse"
 
             proposal = await call("propose_action", {"action_id": "rightsize-ec2"})
             assert proposal["status"] == "proposed" and proposal["proof_snapshot"]
+            assert len(proposal["proof_hash"]) == 64 and proposal["approval_challenge"], \
+                "proposal must carry its proof hash and approval challenge"
 
-            mandate = await call("approve_action",
-                                 {"proposal_id": proposal["proposal_id"], "approver": "probe"})
-            assert mandate["status"] == "issued" and len(mandate["signature"]) == 64
+            # The MCP surface CANNOT approve — not even by claiming to be a
+            # human. Approval lives on the authenticated web surface only.
+            self_approved = await call("approve_action", {"proposal_id": proposal["proposal_id"]})
+            assert self_approved.get("refused") is True, \
+                "an unauthenticated surface must never be able to approve"
+            assert "authenticated" in self_approved["error"]
 
-            receipt = await call("execute_action", {"mandate_id": mandate["mandate_id"]})
-            assert receipt["simulated"] is True and receipt["monthly_saving"] > 0
-            assert receipt["mandate_id"] == mandate["mandate_id"]
-
-            replay = await call("execute_action", {"mandate_id": mandate["mandate_id"]})
-            assert replay.get("refused") is True, "mandates must be single-use"
+            replay = await call("execute_action", {"mandate_id": "m-bogus000"})
+            assert replay.get("refused") is True, "bogus mandates must refuse"
 
             actions_view = await call("mandate_status", {})
-            assert actions_view["counts"]["executed"] == 1
-            log("[6/8] action loop -> propose/approve/execute returned a receipt; "
-                "bogus and replayed mandates both refused")
+            assert actions_view["counts"]["mandates_issued"] == 0
+            assert actions_view["counts"]["proposals_open"] == 1
+            log("[6/8] action boundary -> propose carries proof_hash + challenge; "
+                "unauthenticated approve refused and logged; bogus execution refused")
 
             # --- MCP Apps surface --------------------------------------------
             resources = await session.list_resources()
@@ -186,10 +189,12 @@ async def _probe(url: str, log) -> None:
 
             trail = await call("decision_ledger", {})
             kinds = {e["kind"] for e in trail["entries"]}
-            assert {"propose", "approve", "execute", "refuse"} <= kinds, (
-                f"ledger missing action-loop entries: {kinds}")
-            log("[8/8] decision_ledger -> propose/approve/execute/refuse all recorded "
-                "over the wire")
+            assert {"propose", "refuse"} <= kinds, (
+                f"ledger missing action-boundary entries: {kinds}")
+            # the full approve -> execute -> receipt loop is proven end to end
+            # by tools/e2e_flow.py on the authenticated web surface
+            log("[8/8] decision_ledger -> propose and the unauthenticated-approve "
+                "refusal recorded over the wire")
 
 
 def main() -> int:

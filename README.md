@@ -6,7 +6,7 @@
 MCP endpoint (`/mcp`, Streamable HTTP) are both served publicly. All
 providers are simulated; no credentials exist anywhere.
 
-**An agentic spending copilot for households and small teams — it watches your bills across providers, proves what you can save, and with your signed mandate it executes the fix and hands you the receipt. Every decision is recorded.**
+**An agentic spend-remediation copilot for AI and cloud teams — it watches your bills across providers, proves the next move before proposing it, and executes only inside a mandate signed by an authenticated human session. Every decision, including every refusal, is recorded.**
 
 > It doesn't wait for you to ask. It proves before it proposes. And it never moves a cent without your signed authorization.
 
@@ -39,13 +39,18 @@ detect -> prove -> propose -> [human approves] -> signed mandate -> execute -> r
 
 - **propose** — the agent attaches its proof to a concrete, bounded action
   (one provider, one operation, a dollar cap).
-- **approve** — the human authorizes; the server issues a signed mandate:
-  HMAC-SHA256 over a canonical payload, single-use, scope-capped at the
-  current bill, 15-minute expiry. A local stand-in for AP2 verifiable
-  credentials — labeled as such, never oversold.
+- **approve** — authorization is bound to an authenticated web session:
+  the browser mints a session token, and ONLY a request carrying it can
+  approve. The MCP surface refuses approval by design (an unauthenticated
+  caller self-reporting "approver=human" proves nothing), and the refusal
+  is logged. The mandate — HMAC-SHA256, single-use, scope-capped,
+  15-minute expiry — records the approving session fingerprint and the
+  proof hash of exactly what was approved. This is a local stand-in for
+  Alexa+ account linking / AP2 verifiable credentials.
 - **execute** — the provider adapter runs ONLY if the mandate verifies:
-  signature, expiry, single-use, and scope drift (if the real bill rose past
-  the approved cap, execution is refused and re-approval is required).
+  signature, expiry, single-use under concurrency (process lock), proof
+  hash still matching the approved evidence, and scope drift (if reality
+  moved past the cap, execution is refused and re-approval is required).
 - **receipt** — the adapter's report lands in the decision ledger.
 - **every refusal is logged** — unknown, forged, expired, replayed, or
   drifted mandates all produce structured refusals with ledger entries.
@@ -92,8 +97,9 @@ mcp_server/tools.py (pure analysis — single source of truth)
   ├── actions.py      mandate-gated loop: propose -> approve -> execute
   └── adapters.py     simulated provider adapters (aws / figma / zoom / openai)
 
-benchmarks/           sealed two-phase evaluation (predictions sealed before
-                      gold labels are opened) — 12 held-out cases
+benchmarks/           two-phase evaluation (predictions sealed before gold
+                      labels are opened): 12 public regression fixtures + a
+                      24-case hidden holdout (labels kept out of the repo)
 docs/                 CLAIMS.md · SCOPE-FREEZE.md · JUDGE-REPRODUCTION.md · EVIDENCE.md
 SHA256SUMS.txt        whole-repo integrity manifest
 ```
@@ -149,7 +155,7 @@ Judges: see [docs/JUDGE-REPRODUCTION.md](docs/JUDGE-REPRODUCTION.md) for the
 | Claim | Evidence |
 |---|---|
 | 100 automated tests pass (tools, ledger, store, actions, benchmark, API, MCP wire) | `docs/evidence/test-run.txt` |
-| Detection: flag precision 1.0 / recall 1.0, keep/hold accuracy 1.0 (12 sealed cases) | `benchmarks/results/metrics.json` |
+| Detection: public regression 12/12 + hidden holdout 24/24 (flag P/R 1.0, keep/hold 1.0) | `benchmarks/results/metrics.json`, `benchmarks/results/holdout-metrics.json` |
 | Real MCP client roundtrip: protocol 2025-11-25, 13/13 tools, action loop + ui:// resource over the wire | `docs/evidence/mcp-roundtrip.txt` |
 | End-to-end web flow (9 criteria, incl. mandate replay refusal) | `docs/evidence/e2e-flow.txt` |
 

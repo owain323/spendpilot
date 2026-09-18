@@ -1,22 +1,38 @@
 """Persistent JSON state for SpendPilot.
 
 This is the cross-session memory of the product: budgets, acknowledged
-alerts, and per-session conversation bookmarks survive restarts. State lives
-in a single local JSON file; nothing leaves the machine.
+alerts, and per-session conversation bookmarks survive restarts. State
+lives in local JSON files; nothing leaves the machine.
+
+Workspace isolation (2026-09-18): every authenticated web session gets
+its own state file, so two judges playing with the public demo can never
+see — or pollute — each other's budgets, mandates, or ledger. Requests
+without a session token land in a shared anonymous workspace. The MCP
+surface runs in its own workspace too (it cannot approve actions, but it
+can still hold budgets).
+
+Fail-closed on corruption (2026-09-18): a state file that no longer
+parses is PRESERVED under a .corrupt-<ts> name and an error is raised.
+Silently starting from defaults would erase the audit trail — the one
+thing this product promises never to lose.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
+import secrets
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 DEFAULT_STATE: dict = {
     "budgets": {},          # category -> {"monthly_limit": float}
     "acknowledged": [],     # anomaly ids the human has already seen
     "sessions": {},         # session_id -> {"history": [...], "created": str}
-    "ledger": [],           # decision event stream (see ledger.py)
+    "auth_sessions": {},    # token_hash -> {"workspace": str, "created": str}
+    "ledger": [],           # decision event stream (see ledger.py; hash-chained)
     "alerts_fired": {},     # anomaly_id -> month last surfaced (suppression)
     "suppressed": {},       # anomaly_id -> month a suppression was logged
     "challenges": [],       # human overrules, fed back as context
@@ -27,39 +43,112 @@ DEFAULT_STATE: dict = {
 }
 
 _ENV_KEY = "SPENDPILOT_STATE"
+_ANONYMOUS_WORKSPACE = "anonymous"
+
+# Process-level current workspace. The web backend sets this per request
+# under its global state lock; tests and probes never touch it (they use
+# SPENDPILOT_STATE, which takes priority below).
+_current_workspace: str | None = None
 
 
-def state_path() -> Path:
-    """Resolve the state file location (env-overridable for tests)."""
+def set_workspace(workspace: str | None) -> None:
+    global _current_workspace
+    _current_workspace = workspace
+
+
+def current_workspace() -> str | None:
+    return _current_workspace
+
+
+def state_path(path: Path | None = None) -> Path:
+    """Resolve the state file location.
+
+    Priority: explicit `path` argument > SPENDPILOT_STATE env (tests and
+    probes use single-file mode) > workspace file (per-session isolation).
+    """
+    if path is not None:
+        return path
     raw = os.environ.get(_ENV_KEY)
     if raw:
         return Path(raw)
-    return Path(__file__).resolve().parent.parent / "data" / "state.json"
+    workspace = _current_workspace or _ANONYMOUS_WORKSPACE
+    # workspace ids are hex fingerprints minted by this module; sanitize anyway
+    safe = "".join(c for c in workspace if c.isalnum() or c == "-")[:64] or "anonymous"
+    return Path(__file__).resolve().parent.parent / "data" / "workspaces" / f"{safe}.json"
+
+
+def _token_hash(token: str) -> str:
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def open_auth_session() -> dict:
+    """Mint a fresh authenticated session.
+
+    The server keeps only the token HASH; the browser holds the token and
+    presents it on approve. The workspace id is derived from the hash so
+    every session lands in its own state file.
+    """
+    token = secrets.token_hex(32)
+    h = _token_hash(token)
+    state = load_state()
+    state["auth_sessions"][h] = {
+        "workspace": h[:12],
+        "created": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }
+    save_state(state)
+    return {"session_token": token, "workspace": h[:12]}
+
+
+def workspace_for_token(token: str | None) -> str:
+    """Workspace id for a presented token; anonymous when missing/unknown."""
+    if not token:
+        return _ANONYMOUS_WORKSPACE
+    state = load_state()
+    record = state["auth_sessions"].get(_token_hash(token))
+    return record["workspace"] if record else _ANONYMOUS_WORKSPACE
+
+
+def token_is_authenticated(token: str | None) -> bool:
+    if not token:
+        return False
+    state = load_state()
+    return _token_hash(token) in state["auth_sessions"]
 
 
 def load_state(path: Path | None = None) -> dict:
-    """Load state, falling back to defaults for any missing key."""
-    path = path or state_path()
+    """Load state, filling defaults for any missing key.
+
+    Fail-closed on corruption: the unreadable file is preserved under a
+    .corrupt-<timestamp> sibling and RuntimeError is raised — silently
+    starting from defaults would destroy the audit trail.
+    """
+    resolved = path or state_path()
     state = json.loads(json.dumps(DEFAULT_STATE))
-    if path.exists():
+    if resolved.exists():
         try:
-            stored = json.loads(path.read_text(encoding="utf-8"))
-            if isinstance(stored, dict):
-                state.update(stored)
-        except (json.JSONDecodeError, OSError):
-            pass  # corrupt state must never crash the agent; start clean
+            stored = json.loads(resolved.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+            preserved = resolved.with_suffix(f".corrupt-{stamp}.json")
+            os.replace(resolved, preserved)
+            raise RuntimeError(
+                f"state file {resolved} is corrupt and was preserved at {preserved}; "
+                "repair or delete it — the audit trail is never silently reset"
+            ) from exc
+        if isinstance(stored, dict):
+            state.update(stored)
     return state
 
 
 def save_state(state: dict, path: Path | None = None) -> None:
     """Atomically persist state (write-temp-then-replace)."""
-    path = path or state_path()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
+    resolved = path or state_path()
+    resolved.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=resolved.parent, suffix=".tmp")
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as fh:
             json.dump(state, fh, indent=2, ensure_ascii=False)
-        os.replace(tmp, path)
+        os.replace(tmp, resolved)
     finally:
         if os.path.exists(tmp):
             os.unlink(tmp)

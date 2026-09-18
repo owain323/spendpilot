@@ -19,6 +19,11 @@ def isolated_state(tmp_path, monkeypatch):
     monkeypatch.setenv("SPENDPILOT_STATE", str(tmp_path / "state.json"))
 
 
+def _session() -> str:
+    """Mint an authenticated web session (the only surface that may approve)."""
+    return actions.open_session()["session_token"]
+
+
 def _propose(action_id: str = "rightsize-ec2") -> dict:
     proposal = actions.propose_action(action_id)
     assert "proposal_id" in proposal
@@ -26,6 +31,7 @@ def _propose(action_id: str = "rightsize-ec2") -> dict:
 
 
 def _approve(proposal: dict, **kwargs) -> dict:
+    kwargs.setdefault("session_token", _session())
     mandate = actions.approve_action(proposal["proposal_id"], **kwargs)
     assert "mandate_id" in mandate
     return mandate
@@ -123,8 +129,10 @@ class TestExecute:
         assert "single-use" in second["error"]
         assert len(actions.mandate_status()["receipts"]) == 1
 
-    def test_expired_mandate_refused(self):
-        mandate = _approve(_propose(), ttl_seconds=-1)  # already expired
+    def test_expired_mandate_refused(self, monkeypatch):
+        mandate = _approve(_propose())
+        future = datetime.now(timezone.utc) + timedelta(seconds=actions.MANDATE_TTL_SECONDS + 60)
+        monkeypatch.setattr(actions, "_now", lambda: future)
         result = actions.execute_action(mandate["mandate_id"])
         assert result["refused"] is True
         assert "expired" in result["error"]
@@ -132,6 +140,9 @@ class TestExecute:
         assert status["mandates"][0]["status"] == "expired"
 
     def test_scope_drift_refused(self, monkeypatch):
+        """Reality moved after approval — the mandate must refuse. With
+        proof hashing, ANY change to the approved evidence (including the
+        bill amount) breaks the committed proof hash first."""
         mandate = _approve(_propose())
         # Reality drifted up beyond the approved cap before execution.
         monkeypatch.setitem(
@@ -139,7 +150,7 @@ class TestExecute:
             .SAVING_ACTIONS["rightsize-ec2"], "monthly_before", 250.0)
         result = actions.execute_action(mandate["mandate_id"])
         assert result["refused"] is True
-        assert "scope drifted" in result["error"]
+        assert "drifted" in result["error"]
         assert "re-approval required" in result["error"]
 
     def test_every_refusal_lands_in_ledger(self):
@@ -185,3 +196,57 @@ class TestMandateStatus:
         raw = json.loads(store.state_path().read_text(encoding="utf-8"))
         assert raw["receipts"] and raw["mandate_secret"]
         assert raw["mandates"][mandate["mandate_id"]]["status"] == "executed"
+
+
+class TestAuthorizationBoundary:
+    """Approval is bound to an authenticated web session — the MCP surface
+    must never be able to say a human agreed."""
+
+    def test_mcp_surface_cannot_approve(self):
+        proposal = _propose()
+        result = actions.approve_action(proposal["proposal_id"])  # no token
+        assert result["refused"] is True
+        assert "authenticated" in result["error"]
+        assert any("authenticated" in e["reason"] for e in ledger.entries()
+                   if e["kind"] == "refuse")
+
+    def test_bogus_token_cannot_approve(self):
+        proposal = _propose()
+        result = actions.approve_action(proposal["proposal_id"], session_token="forged")
+        assert result["refused"] is True
+
+    def test_approver_is_session_fingerprint_not_a_string(self):
+        mandate = _approve(_propose())
+        assert mandate["approver"].startswith("web-session:")
+        assert mandate["approval"]["surface"] == "web"
+
+    def test_ttl_is_not_caller_controlled(self):
+        proposal = _propose()
+        with pytest.raises(TypeError):
+            actions.approve_action(proposal["proposal_id"], ttl_seconds=360000)
+
+    def test_mandate_signs_the_proof_hash(self):
+        proposal = _propose()
+        mandate = _approve(proposal)
+        assert mandate["proof_hash"] == proposal["proof_hash"]
+        assert len(mandate["proof_hash"]) == 64
+
+    def test_proof_drift_since_approval_refused(self, monkeypatch):
+        mandate = _approve(_propose())
+        sample = __import__("mcp_server.sample_data", fromlist=["SAVING_ACTIONS"])
+        monkeypatch.setitem(sample.SAVING_ACTIONS["rightsize-ec2"],
+                            "monthly_after", 10.0)
+        result = actions.execute_action(mandate["mandate_id"])
+        assert result["refused"] is True
+        assert "proof drifted" in result["error"]
+
+    def test_single_use_holds_under_concurrency(self):
+        mandate = _approve(_propose())
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(
+                lambda _: actions.execute_action(mandate["mandate_id"]), range(2)))
+        receipts = [r for r in results if r.get("simulated")]
+        refusals = [r for r in results if r.get("refused")]
+        assert len(receipts) == 1 and len(refusals) == 1
+        assert "single-use" in refusals[0]["error"]

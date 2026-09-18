@@ -43,12 +43,12 @@ _TRANSPORT_SECURITY = TransportSecuritySettings(
 mcp = FastMCP(
     "spendpilot",
     instructions=(
-        "Agentic spending copilot for households and small teams. Watches "
+        "Agentic spend-remediation copilot for AI and cloud teams. Watches "
         "multi-provider bills, proves savings before proposing them, remembers "
-        "budgets across sessions, and — with a signed human mandate — executes "
-        "the approved action through provider adapters and returns a receipt. "
-        "Every decision, including holds, refusals, and executions, is recorded "
-        "in a queryable ledger."
+        "budgets across sessions, and — with a signed mandate issued only to an "
+        "authenticated web session — executes the approved action through "
+        "provider adapters and returns a receipt. Every decision, including "
+        "holds, refusals, and executions, is recorded in a hash-chained ledger."
     ),
     host=os.environ.get("SPENDPILOT_HOST", "127.0.0.1"),
     port=int(os.environ.get("SPENDPILOT_PORT", "8101")),
@@ -135,11 +135,15 @@ def propose_action(action_id: str) -> dict:
 
 
 @mcp.tool()
-def approve_action(proposal_id: str, approver: str = "human") -> dict:
-    """Human authorization: issues a signed mandate — HMAC-SHA256, single-use,
-    scope-capped at the current bill, 15-minute expiry. A local stand-in for
-    AP2 verifiable credentials; labeled as such."""
-    return actions.approve_action(proposal_id, approver=approver)
+def approve_action(proposal_id: str) -> dict:
+    """Refuses, by design: approval requires an authenticated web session.
+
+    This MCP surface cannot approve actions and does not accept self-reported
+    approvers — a caller saying "approver=human" proves nothing. The refusal
+    is structured and logged in the ledger. Approve in the web demo, which
+    authenticates the session; the mandate it issues is signed, single-use,
+    scope-capped, and records the approving session fingerprint."""
+    return actions.approve_action(proposal_id)
 
 
 @mcp.tool()

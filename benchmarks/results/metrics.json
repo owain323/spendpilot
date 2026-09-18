@@ -106,5 +106,5 @@
       "missed_flags": []
     }
   ],
-  "basis": "12 synthetic held-out cases with planted ground truth; sealed two-phase protocol"
+  "basis": "public regression fixtures: 12 synthetic cases with planted ground truth; sealed two-phase protocol"
 }

@@ -19,8 +19,12 @@ def _fmt_money(value: float) -> str:
     return f"${value:,.2f}"
 
 
-def handle(message: str, session_id: str) -> dict:
-    """Route one user message to tools and shape the reply + cards payload."""
+def handle(message: str, session_id: str, session_token: str | None = None) -> dict:
+    """Route one user message to tools and shape the reply + cards payload.
+
+    `session_token` authenticates the web surface; only requests carrying a
+    valid token can approve actions (the mandate records the session
+    fingerprint as the approver)."""
     text = message.strip().lower()
 
     # --- "why didn't you tell me" / decision ledger -----------------------
@@ -65,10 +69,12 @@ def handle(message: str, session_id: str) -> dict:
             return {"reply": "There is nothing on the table to approve. Ask me to "
                              "\"prove the saving\" first — I only act on proven actions.",
                     "cards": []}
-        mandate = actions.approve_action(target["proposal_id"], approver="human (chat)")
+        mandate = actions.approve_action(target["proposal_id"], session_token=session_token)
         if mandate.get("refused"):
+            hint = (" Reload the page to re-authenticate your session, then approve again."
+                    if "authenticated" in mandate["error"] else "")
             return {"reply": f"I refused: {mandate['error']} (logged as ledger "
-                             f"#{mandate['ledger_seq']}).", "cards": []}
+                             f"#{mandate['ledger_seq']}).{hint}", "cards": []}
         return {
             "reply": (
                 f"Approved. I issued signed mandate {mandate['mandate_id']} — single-use, "

@@ -31,3 +31,29 @@ Tool surface (9 MCP tools): `spending_overview`, `detect_anomalies`,
 - Automatic cancellations, payments, or purchases
 - Multi-currency conversion, tax advice, investment advice
 - "Supports 50 providers" breadth claims — we do high-confidence detection on a declared surface
+
+---
+
+## Revision 1 (2026-09-18, security hardening — approved deviation)
+
+External security review found that approval was not bound to any
+authenticated caller (any MCP client could self-report approver="human").
+The following changes deviate from the frozen surface and are SECURITY
+FIXES, not scope creep:
+
+- `approve_action` now requires an authenticated web session token; the
+  MCP surface refuses approval and logs the refusal. The `approver`
+  caller parameter was removed (the TTL caller parameter was removed too:
+  expiry is server policy, fixed at 900s).
+- Mandates now sign a `proof_hash` (the evidence the human approved) and
+  an `approval` block (surface + session fingerprint + challenge).
+  Execution re-derives the proof hash and refuses on drift.
+- Execution is serialized under a process lock: single-use holds under
+  concurrency.
+- State is workspace-isolated (per authenticated web session; anonymous
+  and MCP workspaces are separate files) and fails closed on corruption
+  (corrupt file preserved, never silently reset).
+- The ledger is hash-chained (tamper-evident).
+- Benchmarks: the 12 cases are now honestly labeled PUBLIC REGRESSION
+  FIXTURES; a 24-case hidden holdout (seeded generator, labels gitignored)
+  covers generalization. Tool count unchanged at 13.

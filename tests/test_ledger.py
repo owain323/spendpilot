@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from mcp_server import ledger
+from mcp_server import ledger, store
 
 
 @pytest.fixture(autouse=True)
@@ -63,3 +63,35 @@ class TestChallenge:
     def test_challenge_unknown_seq_raises(self):
         with pytest.raises(KeyError):
             ledger.challenge(9999, "nothing there")
+
+
+class TestHashChain:
+    """The ledger is tamper-evident: every entry commits to its content and
+    its predecessor, so editing history breaks verification."""
+
+    def test_chain_verifies_after_appends(self):
+        for i in range(5):
+            ledger.record("alert", f"subject-{i}", f"reason {i}")
+        result = ledger.verify_chain()
+        assert result["ok"] is True and result["entries"] >= 5
+
+    def test_editing_history_breaks_the_chain(self):
+        ledger.record("alert", "subject-a", "original reason")
+        ledger.record("alert", "subject-b", "original reason")
+        path = store.state_path()
+        state = store.load_state(path)
+        target = next(e for e in state["ledger"] if e["subject"] == "subject-a")
+        target["reason"] = "rewritten history"
+        store.save_state(state, path)
+        result = ledger.verify_chain()
+        assert result["ok"] is False and result["broken_at"] == target["seq"]
+
+    def test_rewiring_prev_hash_breaks_the_chain(self):
+        ledger.record("alert", "s1", "r1")
+        ledger.record("alert", "s2", "r2")
+        path = store.state_path()
+        state = store.load_state(path)
+        state["ledger"][1]["prev_hash"] = "f" * 64
+        store.save_state(state, path)
+        result = ledger.verify_chain()
+        assert result["ok"] is False and result["broken_at"] == 2

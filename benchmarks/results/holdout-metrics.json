@@ -1,0 +1,206 @@
+{
+  "cases": 24,
+  "flag_precision": 1.0,
+  "flag_recall": 1.0,
+  "flag_tp": 14,
+  "flag_fp": 0,
+  "flag_fn": 0,
+  "keep_accuracy": 1.0,
+  "hold_accuracy": 1.0,
+  "cases_fully_correct": 24,
+  "per_case": [
+    {
+      "case_id": "h01-idle-cloud-spike",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h02-idle-cloud-spike",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h03-growth-is-value",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h04-growth-is-value",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h05-trial-conversion",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h06-trial-conversion",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h07-zombie",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h08-zombie",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h09-task-drift",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h10-task-drift",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h11-insufficient-history",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h12-insufficient-history",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h13-small-change-no-alert",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h14-small-change-no-alert",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h15-small-dollar-spike",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h16-small-dollar-spike",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h17-multi-provider",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h18-multi-provider",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h19-trend-not-spike",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h20-trend-not-spike",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h21-volume-up-cost-flat",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h22-volume-up-cost-flat",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h23-strong-spike-confidence",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "h24-strong-spike-confidence",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    }
+  ],
+  "basis": "hidden holdout: 24 derived cases (rescaled, renamed, time-shifted from the same decision structures; seeded generator in tools/make_holdout.py; labels kept out of the repo)"
+}
