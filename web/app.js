@@ -9,9 +9,9 @@ const chatEl = document.getElementById("chat");
 const inputEl = document.getElementById("input");
 const sendBtn = document.getElementById("send");
 const newSessionBtn = document.getElementById("new-session");
-const ledgerBody = document.getElementById("ledger-body");
+
 const statsEl = document.getElementById("stats");
-const ledgerBadgesEl = document.getElementById("ledger-badges");
+const ledgerCountEl = document.getElementById("ledger-count");
 const auditOverlay = document.getElementById("audit-overlay");
 const auditListEl = document.getElementById("audit-list");
 const auditFiltersEl = document.getElementById("audit-filters");
@@ -323,26 +323,7 @@ async function loadLedger() {
   const res = await fetch(`/api/ledger?session_token=${encodeURIComponent(sessionToken || "")}`);
   const data = await res.json();
   auditEntries = data.entries;
-  renderLedgerBadges(data.entries);
-  ledgerBody.innerHTML = data.entries.slice(-6).reverse().map(e =>
-    `<div class="ledger-entry">
-       <span class="kind ${esc(e.kind)}">${esc(e.kind)} #${e.seq}</span>
-       <span class="why"><b>${esc(e.subject)}</b> — ${esc(e.reason)}</span>
-     </div>`).join("") || '<p class="why">No decisions recorded yet.</p>';
-}
-
-function renderLedgerBadges(entries) {
-  if (!ledgerBadgesEl) return;
-  ledgerBadgesEl.innerHTML = AUDIT_GROUPS.map(g => {
-    const n = entries.filter(e => g.kinds.includes(e.kind)).length;
-    return `<button class="ring ring-${g.tone}" type="button"
-              title="${g.label}" data-group="${g.key}">
-              <span class="ring-n">${n}</span><span class="ring-label">${g.label}</span>
-            </button>`;
-  }).join("")
-    + `<button class="audit-open-btn ghost-btn" type="button" data-group="all">Full trail →</button>`;
-  ledgerBadgesEl.querySelectorAll("[data-group]").forEach(btn =>
-    btn.addEventListener("click", () => openAudit(btn.dataset.group)));
+  if (ledgerCountEl) ledgerCountEl.textContent = String(auditEntries.length);
 }
 
 function auditKindLabel(kind) {
@@ -355,8 +336,8 @@ function renderAudit() {
   auditListEl.innerHTML = rows.map(e => `
     <div class="audit-entry">
       <div class="audit-meta">
-        <span class="kind ${esc(e.kind)}">${esc(auditKindLabel(e.kind))} #${e.seq}</span>
-        <span class="audit-ts">${esc(e.ts.replace("T", " ").slice(0, 19))} UTC</span>
+        <span class="kind ${esc(e.kind)}">${esc(auditKindLabel(e.kind))}</span>
+        <span class="audit-ts">#${e.seq} · ${esc(e.ts.replace("T", " ").slice(0, 19))} UTC</span>
       </div>
       <div class="audit-subject"><b>${esc(e.subject)}</b></div>
       <div class="audit-reason">${esc(e.reason)}</div>

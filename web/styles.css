@@ -217,31 +217,15 @@ body {
 
 .ledger-body { max-height: 240px; overflow-y: auto; }
 
-/* --- four decision-count rings (CostPilot-style evidence dots) ---------- */
-.ledger-badges { display: flex; gap: 10px; margin: 4px 0 10px; }
-.ring {
-  background: none; border: none; cursor: pointer; padding: 0;
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  font: inherit;
+.ledger-head-row { display: flex; justify-content: space-between; align-items: center; }
+.count-pill {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 2px solid var(--line-strong); background: var(--panel);
+  color: var(--text); font-size: 13px; font-weight: 700;
+  font-variant-numeric: tabular-nums; cursor: pointer; flex: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
 }
-.ring-n {
-  width: 38px; height: 38px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums;
-  border: 2px solid var(--line-strong); color: var(--text); background: var(--panel);
-  transition: box-shadow 120ms ease, border-color 120ms ease;
-}
-.ring:hover .ring-n { box-shadow: 0 0 0 3px var(--accent-soft); border-color: var(--accent); }
-.ring-label { font-size: 10px; color: var(--muted); letter-spacing: 0.3px; }
-.ring-over .ring-n { border-color: var(--over); color: var(--over); }
-.ring-over:hover .ring-n { box-shadow: 0 0 0 3px var(--over-soft); }
-.ring-accent .ring-n { border-color: var(--accent); color: var(--accent); }
-.ring-accent:hover .ring-n { box-shadow: 0 0 0 3px var(--accent-soft); }
-.ring-warn .ring-n { border-color: var(--warn); color: var(--warn); }
-.ring-warn:hover .ring-n { box-shadow: 0 0 0 3px var(--warn-soft); }
-.ring-ok .ring-n { border-color: var(--ok); color: var(--ok); }
-.ring-ok:hover .ring-n { box-shadow: 0 0 0 3px var(--ok-soft); }
-.audit-open-btn { width: 100%; margin-bottom: 8px; }
+.count-pill:hover { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 
 /* --- audit trail modal --------------------------------------------------- */
 .audit-overlay {
@@ -282,6 +266,17 @@ body {
 .audit-subject { font-size: 13px; }
 .audit-reason { color: var(--muted); font-size: 12.5px; line-height: 1.55; margin-top: 2px; }
 .audit-hash { color: var(--line-strong); font-size: 10.5px; margin-top: 4px; }
+
+.legend { padding: 4px 0 8px; border-bottom: 1px solid var(--line); }
+.legend-row { display: flex; gap: 12px; align-items: flex-start; padding: 7px 0; }
+.legend-row .badge { flex: none; margin: 0; min-width: 74px; text-align: center; }
+.legend-row p { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+.legend-row p b { color: var(--text); }
+
+.audit-promise {
+  padding: 10px 20px; border-top: 1px solid var(--line);
+  background: #f8fafc; color: var(--muted); font-size: 12px;
+}
 .ledger-entry {
   display: grid; grid-template-columns: 72px 1fr; gap: 8px;
   padding: 6px 0; border-top: 1px solid var(--line); font-size: 12px;

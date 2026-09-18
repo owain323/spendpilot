@@ -69,11 +69,15 @@
       </section>
 
       <section class="side-card">
-        <h2>Decision ledger</h2>
-        <p class="side-note">Every alert, hold, suppression and refusal — with its reason.</p>
-        <div class="ledger-badges" id="ledger-badges" role="group" aria-label="decision counts"></div>
-        <button id="audit-open" class="ghost-btn audit-open-btn" type="button">Open audit trail</button>
-        <div id="ledger-body" class="ledger-body"></div>
+        <div class="ledger-head-row">
+          <h2>Decision ledger</h2>
+          <button id="audit-open" class="count-pill" type="button"
+                  title="Open the audit trail" aria-label="Open the audit trail">
+            <span id="ledger-count">0</span>
+          </button>
+        </div>
+        <p class="side-note">Every alert, hold, suppression and refusal — with its
+        reason, hash-chained against tampering. Click the counter to inspect.</p>
       </section>
     </aside>
   </div>
@@ -82,14 +86,32 @@
 <div id="audit-overlay" class="audit-overlay" hidden>
   <div class="audit-modal" role="dialog" aria-modal="true" aria-label="Decision audit trail">
     <header class="audit-head">
-      <div>
-        <h2>Decision audit trail</h2>
-        <p class="chain-line" id="audit-chain">checking chain...</p>
-      </div>
-      <button id="audit-close" class="ghost-btn" type="button">Close</button>
+      <h2>What the ledger counts</h2>
+      <button id="audit-close" class="ghost-btn" type="button" aria-label="Close">Close</button>
     </header>
+    <div class="legend">
+      <div class="legend-row">
+        <span class="badge high">ALERTS</span>
+        <p><b>Something looks wrong.</b> Spend rose without value behind it — shown to you, never acted on by itself.</p>
+      </div>
+      <div class="legend-row">
+        <span class="badge conf">ACTIONS</span>
+        <p><b>Did something.</b> Proposed with proof, approved by your session, executed — each step gets its own entry.</p>
+      </div>
+      <div class="legend-row">
+        <span class="badge medium">HELD</span>
+        <p><b>Deliberately quiet.</b> Low confidence or already surfaced — held back or not repeated, with the reason logged.</p>
+      </div>
+      <div class="legend-row">
+        <span class="badge keep">REFUSED</span>
+        <p><b>Said no.</b> A mandate was forged, expired, replayed, or drifted past its cap — refused and recorded.</p>
+      </div>
+    </div>
     <div class="audit-filters" id="audit-filters" role="group" aria-label="filter by kind"></div>
     <div class="audit-list" id="audit-list"></div>
+    <footer class="audit-promise">
+      <span id="audit-chain">checking chain...</span> — SpendPilot never executes without the trail above.
+    </footer>
   </div>
 </div>
 <script src="/static/app.js"></script>
