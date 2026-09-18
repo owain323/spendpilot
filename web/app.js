@@ -102,6 +102,50 @@ function resetPipeline() {
   pipelineEl.querySelectorAll("li").forEach(li => li.classList.remove("reached", "current"));
 }
 
+/* ---- evidence mini-charts ------------------------------------------------
+ * Rules adopted from the AGC chart spec (v1.1), scoped to inline SVG:
+ * charts carry ONLY numbers already present in the card (no invented data),
+ * one semantic color, no gradients/3D, one conclusion per chart, and every
+ * rendered value matches the text next to it. */
+
+function svgSparkline(points, opts) {
+  const w = 150, h = 40, pad = 3;
+  const vals = points.map(p => p.v);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const span = (max - min) || 1;
+  const step = (w - pad * 2) / (points.length - 1 || 1);
+  const coords = points.map((p, i) => [
+    Math.round((pad + i * step) * 10) / 10,
+    Math.round((h - pad - (p.v - min) / span * (h - pad * 2)) * 10) / 10,
+  ]);
+  const line = coords.map(c => c.join(",")).join(" ");
+  const last = coords[coords.length - 1];
+  const hot = opts && opts.hotLast;
+  const lastDot = `<circle cx="${last[0]}" cy="${last[1]}" r="3"
+      fill="${hot ? "var(--over)" : "var(--accent)"}" />`;
+  const labels = `
+    <text x="${pad}" y="${h - 1}" font-size="9" fill="var(--muted)">${esc(opts.firstLabel || "")}</text>
+    <text x="${w - pad}" y="${h - 1}" font-size="9" fill="var(--muted)" text-anchor="end">${esc(opts.lastLabel || "")}</text>`;
+  return `<svg class="sparkline" viewBox="0 0 ${w} ${h}" role="img"
+      aria-label="${esc(opts.aria || "trend")}">
+      <polyline points="${line}" fill="none" stroke="var(--accent)"
+        stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" opacity="0.9" />
+      ${lastDot}${labels}
+    </svg>`;
+}
+
+function compareBars(before, after) {
+  const afterPct = Math.max(4, Math.round(after / before * 100));
+  return `<div class="compare-bars" role="img" aria-label="before ${money(before)} versus after ${money(after)}">
+      <div class="cb-row"><span class="cb-label">now</span>
+        <div class="cb-track"><div class="cb-fill cb-before" style="width:100%"></div></div>
+        <b class="cb-val">${money(before)}</b></div>
+      <div class="cb-row"><span class="cb-label">after</span>
+        <div class="cb-track"><div class="cb-fill cb-after" style="width:${afterPct}%"></div></div>
+        <b class="cb-val">${money(after)}</b></div>
+    </div>`;
+}
+
 function cardHTML(card) {
   switch (card.type) {
     case "anomaly":
@@ -128,11 +172,7 @@ function cardHTML(card) {
       return `<div class="card">
         <span class="badge conf">${esc(card.confidence)} confidence</span>
         <h3>${esc(card.title)}</h3>
-        <div class="saving-flow">
-          <span class="before">${money(card.monthly_before)}/mo</span>
-          <span class="arrow">→</span>
-          <span class="after">${money(card.monthly_after)}/mo</span>
-        </div>
+        ${compareBars(card.monthly_before, card.monthly_after)}
         <p class="meta">Expected saving: <strong>${card.expected_saving_pct}%</strong>
           (${money(card.annual_saving)}/yr)</p>
         ${card.proof_detail ? `<div class="evidence proof-detail">
@@ -182,11 +222,7 @@ function cardHTML(card) {
         <span class="badge ok">executed</span>
         <span class="badge conf">simulated adapter</span>
         <h3>${esc(card.operation)}</h3>
-        <div class="saving-flow">
-          <span class="before">${money(card.monthly_before)}/mo</span>
-          <span class="arrow">→</span>
-          <span class="after">${money(card.monthly_after)}/mo</span>
-        </div>
+        ${compareBars(card.monthly_before, card.monthly_after)}
         <ul>${card.changes.map(s => `<li>${esc(s)}</li>`).join("")}</ul>
         <p class="meta">Adapter: ${esc(card.adapter)} · mandate ${esc(card.mandate_id)} ·
           approved by ${esc(card.approver)}</p>
@@ -232,6 +268,7 @@ function cardHTML(card) {
         <div class="spark">${card.providers.slice(0, 8).map(p =>
           `<span style="height:${Math.max(8, p.amount / max * 100)}%" title="${esc(p.name)} ${money(p.amount)}"></span>`).join("")}
         </div>
+        <p class="meta">Largest line: <strong>${esc(card.providers.slice(0, 8).reduce((a, b) => a.amount >= b.amount ? a : b).name)}</strong></p>
         <ul>${card.providers.slice(0, 6).map(p =>
           `<li>${esc(p.name)} — ${money(p.amount)}${p.delta_pct ? ` (${p.delta_pct > 0 ? "+" : ""}${p.delta_pct}%)` : ""}</li>`).join("")}
         </ul>
@@ -241,11 +278,24 @@ function cardHTML(card) {
       return `<div class="card">
         <span class="badge conf">unit economics</span>
         <h3>Cost per 1K tasks</h3>
-        <ul>${card.providers.map(r => {
+        ${card.providers.map(r => {
           const last = r.points[r.points.length - 1];
-          const drift = r.drift && r.drift.mom_pct !== null ? `${r.drift.mom_pct > 0 ? "+" : ""}${r.drift.mom_pct}% MoM` : "n/a";
-          return `<li>${esc(r.provider)} — ${money(last.cost_per_1k_tasks)} /1K tasks (${drift})${r.canary ? ' <span class="badge over">canary</span>' : ""}</li>`;
-        }).join("")}</ul>
+          const drift = r.drift && r.drift.mom_pct !== null
+            ? `${r.drift.mom_pct > 0 ? "+" : ""}${r.drift.mom_pct}% MoM` : "n/a";
+          return `<div class="unit-row${r.canary ? " unit-canary" : ""}">
+            <div class="unit-head">
+              <b>${esc(r.provider)}</b>
+              <span>${money(last.cost_per_1k_tasks)} /1K · ${drift}
+                ${r.canary ? ' <span class="badge over">canary</span>' : ""}</span>
+            </div>
+            ${svgSparkline(r.points.map(p => ({ v: p.cost_per_1k_tasks })), {
+              firstLabel: r.points[0].month.slice(2),
+              lastLabel: r.points[r.points.length - 1].month.slice(2),
+              hotLast: r.canary,
+              aria: r.provider + " cost per 1K tasks trend",
+            })}
+          </div>`;
+        }).join("")}
         <p class="note">Total spend is the smoke alarm; cost per task is the canary.</p>
       </div>`;
     case "subscriptions":
