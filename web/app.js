@@ -277,6 +277,23 @@ function cardHTML(card) {
         </ul>
       </div>`;
     }
+    case "provider-detail": {
+      const pts = Object.entries(card.monthly).map(([m, v]) => ({ month: m, v: v }));
+      const prevVal = pts.length >= 2 ? pts[pts.length - 2].v : null;
+      const deltaTxt = card.delta_pct !== null && card.delta_pct !== undefined
+        ? `${card.delta_pct > 0 ? "+" : ""}${card.delta_pct}% vs ${esc(card.prev_month)}`
+        : "";
+      return `<div class="card">
+        <span class="badge conf">${esc(card.month)}</span>
+        <h3>${esc(card.name)}</h3>
+        <p class="amount">${money(card.latest)}</p>
+        ${deltaTxt ? `<p class="meta">${deltaTxt}${prevVal ? ` (was ${money(prevVal)})` : ""}</p>` : ""}
+        ${svgSparkline(pts, { aria: card.name + " monthly spend trend" })}
+        ${sparkAxis(pts[0].month.slice(2), pts[pts.length - 1].month.slice(2))}
+        <p class="note">Six-month spend trend, from the same sample ledger every
+        other number on this page comes from.</p>
+      </div>`;
+    }
     case "unit":
       return `<div class="card">
         <span class="badge conf">unit economics</span>

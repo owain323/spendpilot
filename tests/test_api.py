@@ -70,11 +70,14 @@ class TestChat:
         assert card["title"] == "Route short OpenAI classification calls to a smaller model"
 
     def test_bare_provider_mention_answers_with_numbers(self, client):
-        """A provider name alone is a question about that provider."""
+        """A single provider mention gets a dedicated trend card, not the
+        all-provider overview."""
         res = client.post("/api/chat", json={"message": "how is Anthropic API doing"})
         card = res.json()["cards"][0]
-        assert card["type"] == "overview"
+        assert card["type"] == "provider-detail"
+        assert card["id"] == "anthropic"
         assert "Anthropic" in res.json()["reply"]
+        assert len(card["monthly"]) >= 4  # a real series, not a stub
 
     def test_unknown_message_gets_help(self, client):
         res = client.post("/api/chat", json={"message": "flibbertigibbet"})

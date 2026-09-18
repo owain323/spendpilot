@@ -256,18 +256,36 @@ def handle(message: str, session_id: str, session_token: str | None = None) -> d
 
     if mentioned:
         # A bare provider mention is a question about that provider - answer
-        # with its numbers instead of the generic help text.
+        # with a dedicated trend card (one provider) or the overview (several).
         overview = tools.spending_overview()
         line = next((p for p in overview["providers"]
                      if p["id"] in mentioned), None)
         if line:
+            cards = [{"type": "overview", **overview}]
+            if len(mentioned) == 1:
+                from mcp_server import sample_data as sd
+                prov = next((q for q in sd.PROVIDERS if q["id"] == line["id"]), None)
+                if prov and prov.get("monthly"):
+                    cards = [{
+                        "type": "provider-detail",
+                        "id": line["id"],
+                        "name": line["name"],
+                        "monthly": prov["monthly"],
+                        "latest": line["amount"],
+                        "delta_pct": line.get("delta_pct"),
+                        "month": overview["month"],
+                        "prev_month": overview["prev_month"],
+                    }]
+            delta_txt = ""
+            if line.get("delta_pct") is not None:
+                d = line["delta_pct"]
+                delta_txt = f" ({'+' if d > 0 else ''}{d}% vs {overview['prev_month']})"
             return {
                 "reply": (
-                    f"{line['name']} spent {_fmt_money(line['amount'])} in {overview['month']}"
-                    f"{' (' + ('+' if line.get('delta_pct', 0) > 0 else '') + str(line.get('delta_pct', 0)) + '% vs ' + overview['prev_month'] + ')' if line.get('delta_pct') is not None else ''}. "
+                    f"{line['name']} spent {_fmt_money(line['amount'])} in {overview['month']}{delta_txt}. "
                     "Ask me to \"prove the saving\" for anything that looks off."
                 ),
-                "cards": [{"type": "overview", **overview}],
+                "cards": cards,
             }
     return {
         "reply": (
