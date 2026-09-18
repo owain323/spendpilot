@@ -81,30 +81,38 @@ def _token_hash(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
+def _auth_file() -> Path:
+    """The token->workspace registry. It must live OUTSIDE every workspace
+    file: a request has to resolve the registry BEFORE it can know which
+    workspace file to open. Single-file test mode folds it into the same
+    file (SPENDPILOT_STATE)."""
+    raw = os.environ.get(_ENV_KEY)
+    if raw:
+        return Path(raw)
+    return Path(__file__).resolve().parent.parent / "data" / "auth-sessions.json"
+
+
+def _auth_map() -> dict:
+    return load_state(_auth_file()).get("auth_sessions", {})
+
+
 def open_auth_session() -> dict:
     """Mint a fresh authenticated session.
 
     The server keeps only the token HASH; the browser holds the token and
-    presents it on approve. The auth record is written INTO the workspace
-    file that this token hashes to, so the later approve (which runs under
-    that same workspace) finds it.
+    presents it on approve. The registry maps the hash to the workspace id
+    (derived from the hash), so later requests resolve their own workspace.
     """
     token = secrets.token_hex(32)
     h = _token_hash(token)
     workspace = h[:12]
-    raw = os.environ.get(_ENV_KEY)
-    if raw:
-        # single-file mode (tests/probes): auth lives in the same file
-        ws_path = Path(raw)
-    else:
-        ws_path = (Path(__file__).resolve().parent.parent / "data" / "workspaces"
-                   / f"{workspace}.json")
-    state = load_state(ws_path)
-    state["auth_sessions"][h] = {
+    auth_path = _auth_file()
+    auth = load_state(auth_path)
+    auth["auth_sessions"][h] = {
         "workspace": workspace,
         "created": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
-    save_state(state, ws_path)
+    save_state(auth, auth_path)
     return {"session_token": token, "workspace": workspace}
 
 
@@ -112,16 +120,14 @@ def workspace_for_token(token: str | None) -> str:
     """Workspace id for a presented token; anonymous when missing/unknown."""
     if not token:
         return _ANONYMOUS_WORKSPACE
-    state = load_state()
-    record = state["auth_sessions"].get(_token_hash(token))
+    record = _auth_map().get(_token_hash(token))
     return record["workspace"] if record else _ANONYMOUS_WORKSPACE
 
 
 def token_is_authenticated(token: str | None) -> bool:
     if not token:
         return False
-    state = load_state()
-    return _token_hash(token) in state["auth_sessions"]
+    return _token_hash(token) in _auth_map()
 
 
 def load_state(path: Path | None = None) -> dict:
