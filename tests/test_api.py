@@ -53,7 +53,10 @@ class TestChat:
     def test_ledger_intent(self, client):
         client.post("/api/chat", json={"message": "anything unusual?"})
         res = client.post("/api/chat", json={"message": "why didn't you tell me?"})
-        assert res.json()["cards"][0]["type"] == "ledger"
+        # The full trail lives in the side rail now; the chat answer stays
+        # light and points there.
+        assert "Decision ledger panel" in res.json()["reply"]
+        assert res.json()["cards"] == []
 
     def test_challenge_unknown_seq(self, client):
         res = client.post("/api/chat", json={"message": "challenge #9999"})
@@ -71,6 +74,10 @@ class TestChat:
 
 
 class TestLedgerApi:
+    def test_ledger_verify_reports_chain_ok(self, client):
+        client.post("/api/chat", json={"message": "anything unusual?"})
+        v = client.get("/api/ledger/verify").json()
+        assert v["ok"] is True and v["entries"] >= 1 and v["broken_at"] is None
     def test_ledger_grows_with_actions(self, client):
         before = client.get("/api/ledger").json()["count"]
         client.post("/api/chat", json={"message": "set a $300 budget for home"})

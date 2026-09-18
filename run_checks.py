@@ -23,7 +23,7 @@ def is_cjk(ch: str) -> bool:
 
 
 # Emoji + typographic punctuation + ASCII-art box drawing used in docs/UI copy.
-ALLOWED_NON_ASCII = set("🎙⚠️🚨⚡🔍📉🎯🤫—–·’'““”│▼▲─├└┐┌┘┤┬┴┼≥→≤✅⬜✓")
+ALLOWED_NON_ASCII = set("🎙⚠️🚨⚡🔍📉🎯🤫—–·’'““”│▼▲─├└┐┌┘┤┬┴┼≥→≤✅⬜✓✗")
 
 
 def check_language() -> bool:

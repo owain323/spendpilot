@@ -11,6 +11,11 @@ const sendBtn = document.getElementById("send");
 const newSessionBtn = document.getElementById("new-session");
 const ledgerBody = document.getElementById("ledger-body");
 const statsEl = document.getElementById("stats");
+const ledgerBadgesEl = document.getElementById("ledger-badges");
+const auditOverlay = document.getElementById("audit-overlay");
+const auditListEl = document.getElementById("audit-list");
+const auditFiltersEl = document.getElementById("audit-filters");
+const auditChainEl = document.getElementById("audit-chain");
 const pipelineEl = document.getElementById("pipeline");
 
 const SESSION_KEY = "spendpilot.session";
@@ -251,15 +256,6 @@ function cardHTML(card) {
           `<li>${esc(s.name)} — ${money(s.monthly)}/mo${s.flag === "zombie" ? ' — <span class="badge warn">unused ' + s.last_used_days + "d</span>" : ""}</li>`).join("")}
         </ul>
       </div>`;
-    case "ledger":
-      return `<div class="card">
-        <span class="badge conf">decision ledger</span>
-        <h3>Decision ledger</h3>
-        <ul>${card.entries.map(e =>
-          `<li><b>${esc(e.kind)}</b> ${esc(e.subject)} — ${esc(e.reason)}</li>`).join("")}
-        </ul>
-        <p class="note">Challenge any entry: "challenge #3" — your overrule becomes my context.</p>
-      </div>`;
     default:
       return "";
   }
@@ -308,15 +304,105 @@ async function send(text) {
   loadLedger();
 }
 
+const AUDIT_GROUPS = [
+  { key: "alert",   label: "Alerts",   kinds: ["alert"], tone: "over" },
+  { key: "action",  label: "Actions",  kinds: ["propose", "approve", "execute"], tone: "accent" },
+  { key: "quiet",   label: "Held",     kinds: ["suppress", "hold"], tone: "warn" },
+  { key: "refused", label: "Refusals", kinds: ["refuse", "challenge"], tone: "ok" },
+];
+
+function groupOf(kind) {
+  const g = AUDIT_GROUPS.find(g => g.kinds.includes(kind));
+  return g ? g.key : "action";
+}
+
+let auditEntries = [];
+let auditFilter = "all";
+
 async function loadLedger() {
   const res = await fetch(`/api/ledger?session_token=${encodeURIComponent(sessionToken || "")}`);
   const data = await res.json();
-  ledgerBody.innerHTML = data.entries.map(e =>
+  auditEntries = data.entries;
+  renderLedgerBadges(data.entries);
+  ledgerBody.innerHTML = data.entries.slice(-6).reverse().map(e =>
     `<div class="ledger-entry">
        <span class="kind ${esc(e.kind)}">${esc(e.kind)} #${e.seq}</span>
        <span class="why"><b>${esc(e.subject)}</b> — ${esc(e.reason)}</span>
      </div>`).join("") || '<p class="why">No decisions recorded yet.</p>';
 }
+
+function renderLedgerBadges(entries) {
+  if (!ledgerBadgesEl) return;
+  ledgerBadgesEl.innerHTML = AUDIT_GROUPS.map(g => {
+    const n = entries.filter(e => g.kinds.includes(e.kind)).length;
+    return `<button class="ring ring-${g.tone}" type="button"
+              title="${g.label}" data-group="${g.key}">
+              <span class="ring-n">${n}</span><span class="ring-label">${g.label}</span>
+            </button>`;
+  }).join("")
+    + `<button class="audit-open-btn ghost-btn" type="button" data-group="all">Full trail →</button>`;
+  ledgerBadgesEl.querySelectorAll("[data-group]").forEach(btn =>
+    btn.addEventListener("click", () => openAudit(btn.dataset.group)));
+}
+
+function auditKindLabel(kind) {
+  return kind.charAt(0).toUpperCase() + kind.slice(1);
+}
+
+function renderAudit() {
+  const rows = auditEntries.filter(e =>
+    auditFilter === "all" || groupOf(e.kind) === auditFilter).reverse();
+  auditListEl.innerHTML = rows.map(e => `
+    <div class="audit-entry">
+      <div class="audit-meta">
+        <span class="kind ${esc(e.kind)}">${esc(auditKindLabel(e.kind))} #${e.seq}</span>
+        <span class="audit-ts">${esc(e.ts.replace("T", " ").slice(0, 19))} UTC</span>
+      </div>
+      <div class="audit-subject"><b>${esc(e.subject)}</b></div>
+      <div class="audit-reason">${esc(e.reason)}</div>
+      <div class="audit-hash mono" title="hash-chain: tamper-evident">chain ${esc((e.hash || "").slice(0, 12))}</div>
+    </div>`).join("")
+    || '<p class="side-note">No entries in this view yet.</p>';
+}
+
+async function openAudit(filter) {
+  auditFilter = filter || "all";
+  await loadLedger();
+  auditFiltersEl.innerHTML = [{ key: "all", label: "All" }].concat(AUDIT_GROUPS).map(g => {
+    const n = g.key === "all" ? auditEntries.length
+      : auditEntries.filter(e => g.kinds.includes(e.kind)).length;
+    return `<button class="audit-chip${auditFilter === g.key ? " active" : ""}"
+              type="button" data-f="${g.key}">${g.label} (${n})</button>`;
+  }).join("");
+  auditFiltersEl.querySelectorAll("[data-f]").forEach(btn =>
+    btn.addEventListener("click", () => {
+      auditFilter = btn.dataset.f;
+      auditFiltersEl.querySelectorAll(".audit-chip").forEach(c =>
+        c.classList.toggle("active", c.dataset.f === auditFilter));
+      renderAudit();
+    }));
+  renderAudit();
+  fetch(`/api/ledger/verify?session_token=${encodeURIComponent(sessionToken || "")}`)
+    .then(r => r.json())
+    .then(v => {
+      auditChainEl.innerHTML = v.ok
+        ? `<span class="chain-ok">✓ chain verified</span> — ${v.entries} entries, tamper-evident`
+        : `<span class="chain-bad">✗ chain broken at #${v.broken_at}</span>`;
+    })
+    .catch(() => { auditChainEl.textContent = "chain check unavailable"; });
+  auditOverlay.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeAudit() {
+  auditOverlay.hidden = true;
+  document.body.style.overflow = "";
+}
+
+document.getElementById("audit-open").addEventListener("click", () => openAudit("all"));
+document.getElementById("audit-close").addEventListener("click", closeAudit);
+auditOverlay.addEventListener("click", e => { if (e.target === auditOverlay) closeAudit(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !auditOverlay.hidden) closeAudit(); });
 
 async function boot() {
   await ensureSession();

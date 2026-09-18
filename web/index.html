@@ -71,9 +71,25 @@
       <section class="side-card">
         <h2>Decision ledger</h2>
         <p class="side-note">Every alert, hold, suppression and refusal — with its reason.</p>
+        <div class="ledger-badges" id="ledger-badges" role="group" aria-label="decision counts"></div>
+        <button id="audit-open" class="ghost-btn audit-open-btn" type="button">Open audit trail</button>
         <div id="ledger-body" class="ledger-body"></div>
       </section>
     </aside>
+  </div>
+</div>
+
+<div id="audit-overlay" class="audit-overlay" hidden>
+  <div class="audit-modal" role="dialog" aria-modal="true" aria-label="Decision audit trail">
+    <header class="audit-head">
+      <div>
+        <h2>Decision audit trail</h2>
+        <p class="chain-line" id="audit-chain">checking chain...</p>
+      </div>
+      <button id="audit-close" class="ghost-btn" type="button">Close</button>
+    </header>
+    <div class="audit-filters" id="audit-filters" role="group" aria-label="filter by kind"></div>
+    <div class="audit-list" id="audit-list"></div>
   </div>
 </div>
 <script src="/static/app.js"></script>

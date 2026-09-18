@@ -27,7 +27,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from mcp_server import actions, store, tools
+from mcp_server import actions, ledger, store, tools
 
 from . import brain
 
@@ -130,6 +130,17 @@ def get_ledger(session_token: str | None = None) -> dict:
         store.set_workspace(store.workspace_for_token(session_token))
         try:
             return tools.decision_ledger()
+        finally:
+            store.set_workspace(None)
+
+
+@app.get("/api/ledger/verify")
+def verify_ledger(session_token: str | None = None) -> dict:
+    """Re-derive the ledger hash chain - tamper-evidence as a checkable fact."""
+    with _STATE_LOCK:
+        store.set_workspace(store.workspace_for_token(session_token))
+        try:
+            return ledger.verify_chain()
         finally:
             store.set_workspace(None)
 

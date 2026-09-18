@@ -32,10 +32,11 @@ def handle(message: str, session_id: str, session_token: str | None = None) -> d
                                "held back", "ledger", "decisions", "what did you decide")):
         trail = tools.decision_ledger()
         held = [e for e in trail["entries"] if e["kind"] in ("hold", "suppress")]
-        reply = "Here is every decision I made, including the ones where I stayed quiet:"
-        if held:
-            reply += f" {len(held)} entr(ies) are things I deliberately did NOT bother you with."
-        return {"reply": reply, "cards": [{"type": "ledger", "entries": trail["entries"][:12]}]}
+        reply = ("Here is every decision I made, including the ones where I stayed quiet: "
+                 f"{len(held)} thing(s) I deliberately did NOT bother you with. "
+                 "The full trail - with the tamper-evidence check - lives in the "
+                 "Decision ledger panel on the right.")
+        return {"reply": reply, "cards": []}
 
     # --- human challenge (overrule flows back as context) ------------------
     challenge_match = re.search(r"(?:challenge|overrule|disagree)\s+#?(\d+)", text)
