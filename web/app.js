@@ -267,8 +267,10 @@ function cardHTML(card) {
 
 function addCards(cards) {
   if (!cards || !cards.length) return;
+  // A wrapping grid, not a horizontal scroller: cards must never depend on
+  // a scroll container's height, mask, or scrollbar to be visible.
   const row = document.createElement("div");
-  row.className = "carousel";
+  row.className = "card-grid";
   row.innerHTML = cards.map(cardHTML).join("");
   chatEl.appendChild(row);
   chatEl.scrollTop = chatEl.scrollHeight;

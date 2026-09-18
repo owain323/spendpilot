@@ -241,10 +241,17 @@ def opening(session_id: str) -> dict:
     briefing = tools.proactive_briefing()
     cards = [{"type": "anomaly", **a} for a in briefing["anomalies"]]
     cards += [{"type": "kept", **k} for k in briefing["kept"]]
+    # "Needs attention" counts what is ACTUALLY wrong this month, not what
+    # this particular greeting chose to repeat: in a repeat visit the
+    # proactive path suppresses already-surfaced findings, and reporting 0
+    # while the ledger holds three alerts would contradict the sweep.
+    month = briefing["overview"]["month"]
+    alerted = {e["subject"] for e in tools.decision_ledger()["entries"]
+               if e["kind"] == "alert"}
     return {"reply": briefing["headline"], "cards": cards, "stats": {
-        "month": briefing["overview"]["month"],
+        "month": month,
         "total": briefing["overview"]["total"],
         "delta_pct": briefing["overview"]["delta_pct"],
-        "anomalies": len(briefing["anomalies"]),
+        "anomalies": len(briefing["anomalies"]) or len(alerted),
         "saving_potential": briefing["total_monthly_saving_potential"],
     }}
