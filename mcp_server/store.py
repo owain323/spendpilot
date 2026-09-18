@@ -85,18 +85,27 @@ def open_auth_session() -> dict:
     """Mint a fresh authenticated session.
 
     The server keeps only the token HASH; the browser holds the token and
-    presents it on approve. The workspace id is derived from the hash so
-    every session lands in its own state file.
+    presents it on approve. The auth record is written INTO the workspace
+    file that this token hashes to, so the later approve (which runs under
+    that same workspace) finds it.
     """
     token = secrets.token_hex(32)
     h = _token_hash(token)
-    state = load_state()
+    workspace = h[:12]
+    raw = os.environ.get(_ENV_KEY)
+    if raw:
+        # single-file mode (tests/probes): auth lives in the same file
+        ws_path = Path(raw)
+    else:
+        ws_path = (Path(__file__).resolve().parent.parent / "data" / "workspaces"
+                   / f"{workspace}.json")
+    state = load_state(ws_path)
     state["auth_sessions"][h] = {
-        "workspace": h[:12],
+        "workspace": workspace,
         "created": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
-    save_state(state)
-    return {"session_token": token, "workspace": h[:12]}
+    save_state(state, ws_path)
+    return {"session_token": token, "workspace": workspace}
 
 
 def workspace_for_token(token: str | None) -> str:
