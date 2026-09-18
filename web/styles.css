@@ -159,12 +159,17 @@ body {
 .bar.warn > span { background: var(--warn); }
 .bar.over > span { background: var(--over); }
 
-.sparkline { width: 100%; height: 40px; display: block; margin: 6px 0 2px; }
-.unit-row { padding: 8px 0; border-top: 1px solid var(--line); }
+.sparkline { width: 100%; height: auto; display: block; margin: 8px 0 0; }
+.spark-axis {
+  display: flex; justify-content: space-between;
+  font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums;
+  margin: 2px 0 4px;
+}
+.unit-row { padding: 10px 0; border-top: 1px solid var(--line); }
 .unit-row:first-of-type { border-top: none; padding-top: 2px; }
-.unit-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 12.5px; }
-.unit-head span { color: var(--muted); font-variant-numeric: tabular-nums; }
-.unit-canary .unit-head { color: var(--over); }
+.unit-head { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.unit-sub { color: var(--muted); font-size: 12px; margin: 2px 0 0; font-variant-numeric: tabular-nums; }
+.unit-canary .unit-head b { color: var(--over); }
 
 .compare-bars { display: flex; flex-direction: column; gap: 6px; margin: 10px 0 8px; }
 .cb-row { display: grid; grid-template-columns: 34px 1fr auto; gap: 8px; align-items: center; }

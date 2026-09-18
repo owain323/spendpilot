@@ -109,7 +109,9 @@ function resetPipeline() {
  * rendered value matches the text next to it. */
 
 function svgSparkline(points, opts) {
-  const w = 150, h = 40, pad = 3;
+  // Pure geometry only - labels live in an HTML axis row BELOW the svg, so
+  // text and data points can never collide (AGC 13: no element overlap).
+  const w = 300, h = 72, pad = 6;
   const vals = points.map(p => p.v);
   const min = Math.min(...vals), max = Math.max(...vals);
   const span = (max - min) || 1;
@@ -121,17 +123,20 @@ function svgSparkline(points, opts) {
   const line = coords.map(c => c.join(",")).join(" ");
   const last = coords[coords.length - 1];
   const hot = opts && opts.hotLast;
-  const lastDot = `<circle cx="${last[0]}" cy="${last[1]}" r="3"
+  const lastDot = `<circle cx="${last[0]}" cy="${last[1]}" r="4.5"
       fill="${hot ? "var(--over)" : "var(--accent)"}" />`;
-  const labels = `
-    <text x="${pad}" y="${h - 1}" font-size="9" fill="var(--muted)">${esc(opts.firstLabel || "")}</text>
-    <text x="${w - pad}" y="${h - 1}" font-size="9" fill="var(--muted)" text-anchor="end">${esc(opts.lastLabel || "")}</text>`;
   return `<svg class="sparkline" viewBox="0 0 ${w} ${h}" role="img"
       aria-label="${esc(opts.aria || "trend")}">
+      <line x1="${pad}" y1="${h - pad}" x2="${w - pad}" y2="${h - pad}"
+        stroke="var(--line)" stroke-width="1" />
       <polyline points="${line}" fill="none" stroke="var(--accent)"
-        stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" opacity="0.9" />
-      ${lastDot}${labels}
+        stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      ${lastDot}
     </svg>`;
+}
+
+function sparkAxis(firstLabel, lastLabel) {
+  return `<div class="spark-axis"><span>${esc(firstLabel)}</span><span>${esc(lastLabel)}</span></div>`;
 }
 
 function compareBars(before, after) {
@@ -285,15 +290,14 @@ function cardHTML(card) {
           return `<div class="unit-row${r.canary ? " unit-canary" : ""}">
             <div class="unit-head">
               <b>${esc(r.provider)}</b>
-              <span>${money(last.cost_per_1k_tasks)} /1K · ${drift}
-                ${r.canary ? ' <span class="badge over">canary</span>' : ""}</span>
+              ${r.canary ? ' <span class="badge over">canary</span>' : ""}
             </div>
+            <div class="unit-sub">${money(last.cost_per_1k_tasks)} /1K · ${drift} since first month</div>
             ${svgSparkline(r.points.map(p => ({ v: p.cost_per_1k_tasks })), {
-              firstLabel: r.points[0].month.slice(2),
-              lastLabel: r.points[r.points.length - 1].month.slice(2),
               hotLast: r.canary,
               aria: r.provider + " cost per 1K tasks trend",
             })}
+            ${sparkAxis(r.points[0].month.slice(2), r.points[r.points.length - 1].month.slice(2))}
           </div>`;
         }).join("")}
         <p class="note">Total spend is the smoke alarm; cost per task is the canary.</p>
