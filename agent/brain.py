@@ -19,6 +19,27 @@ def _fmt_money(value: float) -> str:
     return f"${value:,.2f}"
 
 
+# Provider aliases: free-form mentions ("prove the openai api", "how is
+# anthropic doing") must resolve to the right provider instead of falling
+# through to the generic fallback.
+PROVIDER_ALIASES = {
+    "aws": "aws", "ec2": "aws", "amazon": "aws",
+    "openai": "openai", "gpt": "openai",
+    "anthropic": "anthropic", "claude": "anthropic",
+    "figma": "figma",
+    "zoom": "zoom",
+}
+
+
+def mentioned_providers(text: str) -> list[str]:
+    """Distinct provider ids mentioned in the message, in order of appearance."""
+    seen = []
+    for alias, pid in PROVIDER_ALIASES.items():
+        if re.search(rf"\b{re.escape(alias)}\b", text) and pid not in seen:
+            seen.append(pid)
+    return seen
+
+
 def handle(message: str, session_id: str, session_token: str | None = None) -> dict:
     """Route one user message to tools and shape the reply + cards payload.
 
@@ -26,6 +47,7 @@ def handle(message: str, session_id: str, session_token: str | None = None) -> d
     valid token can approve actions (the mandate records the session
     fingerprint as the approver)."""
     text = message.strip().lower()
+    mentioned = mentioned_providers(text)
 
     # --- "why didn't you tell me" / decision ledger -----------------------
     if any(k in text for k in ("why didn't you", "why did you not", "not tell me",
@@ -174,6 +196,12 @@ def handle(message: str, session_id: str, session_token: str | None = None) -> d
     save_match = re.search(r"(rightsize-ec2|cancel-figma|annual-zoom|route-haiku)", text)
     if save_match or any(k in text for k in ("prove", "saving", "save", "optimize")):
         action_id = save_match.group(1) if save_match else None
+        if not action_id and mentioned:
+            # "prove the openai api" must prove OPENAI's action, not whoever
+            # happens to have the largest headline number.
+            from mcp_server import sample_data as sd
+            action_id = next((a for a in sd.SAVING_ACTIONS
+                              if sd.SAVING_ACTIONS[a]["provider"] in mentioned), None)
         if not action_id:
             # Pure analysis (no ledger side effects): proof must be available
             # even when the anomaly was already surfaced and suppressed.
@@ -226,6 +254,21 @@ def handle(message: str, session_id: str, session_token: str | None = None) -> d
             "cards": [{"type": "overview", **overview}],
         }
 
+    if mentioned:
+        # A bare provider mention is a question about that provider - answer
+        # with its numbers instead of the generic help text.
+        overview = tools.spending_overview()
+        line = next((p for p in overview["providers"]
+                     if p["id"] in mentioned), None)
+        if line:
+            return {
+                "reply": (
+                    f"{line['name']} spent {_fmt_money(line['amount'])} in {overview['month']}"
+                    f"{' (' + ('+' if line.get('delta_pct', 0) > 0 else '') + str(line.get('delta_pct', 0)) + '% vs ' + overview['prev_month'] + ')' if line.get('delta_pct') is not None else ''}. "
+                    "Ask me to \"prove the saving\" for anything that looks off."
+                ),
+                "cards": [{"type": "overview", **overview}],
+            }
     return {
         "reply": (
             "I watch your bills across providers, prove savings before proposing them, and — "

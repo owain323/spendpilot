@@ -62,6 +62,20 @@ class TestChat:
         res = client.post("/api/chat", json={"message": "challenge #9999"})
         assert "don't have" in res.json()["reply"]
 
+    def test_provider_mention_pins_the_prove_action(self, client):
+        """Prove the openai api must prove OPENAI's action - not whoever has
+        the largest headline number."""
+        res = client.post("/api/chat", json={"message": "prove the openai api"})
+        card = res.json()["cards"][0]
+        assert card["title"] == "Route short OpenAI classification calls to a smaller model"
+
+    def test_bare_provider_mention_answers_with_numbers(self, client):
+        """A provider name alone is a question about that provider."""
+        res = client.post("/api/chat", json={"message": "how is Anthropic API doing"})
+        card = res.json()["cards"][0]
+        assert card["type"] == "overview"
+        assert "Anthropic" in res.json()["reply"]
+
     def test_unknown_message_gets_help(self, client):
         res = client.post("/api/chat", json={"message": "flibbertigibbet"})
         assert "Try:" in res.json()["reply"]

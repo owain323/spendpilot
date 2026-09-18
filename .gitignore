@@ -1,5 +1,5 @@
 # runtime state (never ship)
-data/state.json
+data/
 
 # python caches
 __pycache__/

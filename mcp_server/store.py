@@ -163,6 +163,7 @@ def save_state(state: dict, path: Path | None = None) -> None:
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as fh:
             json.dump(state, fh, indent=2, ensure_ascii=False)
+        # LF on all platforms: runtime files must match the manifest discipline
         os.replace(tmp, resolved)
     finally:
         if os.path.exists(tmp):
