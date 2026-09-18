@@ -127,8 +127,6 @@ function svgSparkline(points, opts) {
       fill="${hot ? "var(--over)" : "var(--accent)"}" />`;
   return `<svg class="sparkline" viewBox="0 0 ${w} ${h}" role="img"
       aria-label="${esc(opts.aria || "trend")}">
-      <line x1="${pad}" y1="${h - pad}" x2="${w - pad}" y2="${h - pad}"
-        stroke="var(--line)" stroke-width="1" />
       <polyline points="${line}" fill="none" stroke="var(--accent)"
         stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
       ${lastDot}
