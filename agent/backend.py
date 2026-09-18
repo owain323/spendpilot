@@ -35,6 +35,17 @@ WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 
 app = FastAPI(title="SpendPilot", version="0.4.0")
 
+
+@app.middleware("http")
+async def no_cache_shell(request, call_next):
+    """The shell and its JS/CSS must always be fresh: a stale app.js paired
+    with a newer backend produced states the UI was never built for."""
+    response = await call_next(request)
+    path = request.url.path
+    if path == "/" or path.startswith("/static"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
 # One process-wide lock around every state-touching request: workspace
 # selection is process-level, so requests must not interleave.
 _STATE_LOCK = threading.Lock()

@@ -318,12 +318,24 @@ async function loadLedger() {
 
 async function boot() {
   await ensureSession();
-  const url = "/api/opening" + (sessionId ? `?session_id=${sessionId}` : "")
-    + `&session_token=${encodeURIComponent(sessionToken || "")}`;
+  // Build the query with URLSearchParams - hand-concatenating broke the URL
+  // when session_id was absent ("/api/opening&session_token=..." -> 404),
+  // which used to render as a silent empty bubble.
+  const params = new URLSearchParams();
+  if (sessionId) params.set("session_id", sessionId);
+  params.set("session_token", sessionToken || "");
+  const url = "/api/opening?" + params.toString();
   const res = await fetch(url);
   const data = await res.json();
   sessionId = data.session_id;
   localStorage.setItem(SESSION_KEY, sessionId);
+  if (!data.reply && !(data.cards || []).length) {
+    // A failed opening used to render as a silent empty bubble.
+    addMessage("agent", "I could not load my opening briefing (" + res.status
+      + "). Reload the page — if it persists, the service is down.");
+    loadLedger();
+    return;
+  }
   renderStats(data.stats);
   addMessage("agent", data.reply);  // the agent speaks first — it does not wait to be asked
   addCards(data.cards);
