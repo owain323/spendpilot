@@ -174,12 +174,38 @@ def analyze_provider(p: dict, months: list[str], latest: str, prev: str | None) 
                 strong = True
 
             if ev.get("usage_matches_value"):
+                # Derive the judgment from unit economics where volume exists:
+                # a rising bill only tracks value if cost per task did NOT
+                # inflate. The boolean stays as the fallback for providers
+                # that do not report task volume.
+                cost_task_delta = None
+                task_volume = p.get("task_volume") or {}
+                if len(vals) >= 2 and len(task_volume) >= 2:
+                    m_first = list(task_volume)[0]
+                    m_last = list(task_volume)[-1]
+                    if task_volume.get(m_first) and task_volume.get(m_last):
+                        c_first = vals[0] / task_volume[m_first]
+                        c_last = vals[-1] / task_volume[m_last]
+                        if c_first > 0:
+                            cost_task_delta = (c_last - c_first) / c_first
+                            signals.append(_ev(
+                                "cost_per_task",
+                                f"{cost_task_delta:+.0%} across the window "
+                                f"({_round(vals[0] / task_volume[m_first])} -> "
+                                f"{_round(vals[-1] / task_volume[m_last])} per task)",
+                                f"{p['id']}.monthly / task_volume"))
+                            if abs(cost_task_delta) < 0.10:
+                                strong = True
+                judgment = ("Growth tracks real value; cutting now would hurt the workload it funds."
+                            if cost_task_delta is None or abs(cost_task_delta) < 0.10 else
+                            "Usage matches value on paper, but cost per task is inflating — "
+                            "worth a closer look before renewal.")
                 return {
                     "id": f"keep-{p['id']}", "provider": p["name"], "verdict": "keep", "eligible": True,
                     "title": f"{p['name']} is up {delta_pct:.0f}% — do NOT cut it",
                     "confidence": _confidence(len(signals), strong),
                     "evidence": signals + [_ev("usage_matches_value", ev["detail"], f"{p['id']}.evidence")],
-                    "judgment": "Growth tracks real value; cutting now would hurt the workload it funds.",
+                    "judgment": judgment,
                 }
             return {
                 "id": f"spike-{p['id']}", "provider": p["name"], "verdict": "flag", "eligible": True,

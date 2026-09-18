@@ -15,6 +15,8 @@ const pipelineEl = document.getElementById("pipeline");
 
 const SESSION_KEY = "spendpilot.session";
 const SESSION_TOKEN_KEY = "spendpilot.sessionToken";
+const proofByProposal = {};  // proposal_id -> the proof shown to
+                             // the human in this session (feeds the approval artifact)
 let sessionId = localStorage.getItem(SESSION_KEY) || null;
 let sessionToken = localStorage.getItem(SESSION_TOKEN_KEY) || null;
 
@@ -115,6 +117,9 @@ function cardHTML(card) {
         <p class="note">${esc(card.judgment)}</p>
       </div>`;
     case "saving":
+      if (card.proposal_id) {
+        proofByProposal[card.proposal_id] = card;
+      }
       return `<div class="card">
         <span class="badge conf">${esc(card.confidence)} confidence</span>
         <h3>${esc(card.title)}</h3>
@@ -125,6 +130,12 @@ function cardHTML(card) {
         </div>
         <p class="meta">Expected saving: <strong>${card.expected_saving_pct}%</strong>
           (${money(card.annual_saving)}/yr)</p>
+        ${card.proof_detail ? `<div class="evidence proof-detail">
+            <div><b>Target</b> — ${esc(card.proof_detail.resource)}</div>
+            ${(card.proof_detail.observations || []).map(o => `<div><b>observed</b> — ${esc(o)}</div>`).join("")}
+            ${(card.proof_detail.assumptions || []).map(a => `<div><b>assumed</b> — ${esc(a)}</div>`).join("")}
+            <div class="src">pricing basis: ${esc(card.proof_detail.pricing_basis)}</div>
+          </div>` : ""}
         <ul>${card.proof_steps.map(s => `<li>${esc(s)}</li>`).join("")}</ul>
         <p class="meta">Risk: ${esc(card.risk)}</p>
         <p class="note">${esc(card.estimate_basis)}</p>
@@ -132,19 +143,35 @@ function cardHTML(card) {
           ? `<p class="note action-hint">On the table as <b>${esc(card.proposal_id)}</b> —
              reply <b>"approve"</b> and I will issue a signed, single-use mandate.</p>` : ""}
       </div>`;
-    case "mandate":
-      return `<div class="card mandate">
-        <span class="badge ok">mandate signed</span>
-        <h3>${esc(card.mandate_id)} · ${esc(card.scope.operation)}</h3>
-        <ul>
-          <li>Scope: ${esc(card.scope.provider)} only — hard cap ${money(card.scope.max_monthly_before)}/mo</li>
-          <li>Single use · expires ${esc(card.expires_at.replace("T", " ").slice(0, 19))} UTC</li>
-          <li>Approver: ${esc(card.approver)}</li>
-        </ul>
-        <p class="meta mono">sig ${esc(card.signature.slice(0, 20))}...</p>
-        <p class="note">HMAC-SHA256 mandate — a local stand-in for AP2 verifiable credentials.
-          Reply <b>"execute"</b> and the adapter runs; without this, nothing moves.</p>
+    case "mandate": {
+      const proof = proofByProposal[card.proposal_id] || {};
+      return `<div class="card approval">
+        <div class="approval-head">APPROVAL</div>
+        <h3>${esc(proof.title || card.scope.operation)}</h3>
+        <div class="kv">
+          <div><span>Provider</span><b>${esc(card.scope.provider)}</b></div>
+          <div><span>Action</span><b>${esc(card.scope.operation)}</b></div>
+          ${proof.monthly_before ? `<div><span>Current</span><b>${money(proof.monthly_before)}/mo</b></div>
+          <div><span>After</span><b>${money(proof.monthly_after)}/mo</b></div>
+          <div><span>Expected saving</span><b class="ok-text">${esc(proof.expected_saving_pct)}%</b></div>`
+          : `<div><span>Cap</span><b>${money(card.scope.max_monthly_before)}/mo</b></div>`}
+        </div>
+        ${(proof.proof_steps || []).map(s => `<div class="check-line">${esc(s)}</div>`).join("")}
+        ${proof.risk ? `<p class="meta">Risk: ${esc(proof.risk)}</p>` : ""}
+        <div class="auth-block">
+          <div class="auth-title">AUTHORIZATION</div>
+          <div class="kv">
+            <div><span>Scope</span><b>${esc(card.scope.provider)} only</b></div>
+            <div><span>Executions</span><b>one</b></div>
+            <div><span>Expires</span><b>${esc(card.expires_at.replace("T", " ").slice(0, 19))} UTC</b></div>
+            <div><span>Proof hash</span><b class="mono">${esc(card.proof_hash.slice(0, 16))}...</b></div>
+            <div><span>Approved by</span><b>${esc(card.approver)}</b></div>
+          </div>
+          <p class="meta mono">sig ${esc(card.signature.slice(0, 20))}... - HMAC-SHA256, a local stand-in for AP2 credentials</p>
+        </div>
+        <p class="note">Reply <b>"execute"</b> and the adapter runs — exactly this, once, before it expires. Without this signature, nothing moves.</p>
       </div>`;
+    }
     case "receipt":
       return `<div class="card receipt">
         <span class="badge ok">executed</span>

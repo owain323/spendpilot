@@ -157,6 +157,12 @@ SAVING_ACTIONS: dict[str, dict] = {
         "monthly_before": 181.34,
         "monthly_after": 96.20,
         "confidence": "high",
+        "proof_detail": {
+            "resource": "i-0f3a2 (t3.2xlarge, us-east-1)",
+            "observations": ["CPU: P50 3.1% / P95 7.4% across 19 consecutive days", "Network I/O flat at ~12 MB/s (no traffic spikes)", "Zero burst-credit consumption in the last 30 days"],
+            "assumptions": ["Same workload envelope and schedule after downsizing", "Attached storage and availability requirements unchanged"],
+            "pricing_basis": "AWS on-demand pricing, us-east-1, sampled 2026-09-15",
+        },
         "risk": "Low — the instance ran at 3% CPU for 19 days; a smaller class keeps headroom.",
         "proof_steps": [
             "CPU utilization < 5% for 19 consecutive days",
@@ -171,6 +177,12 @@ SAVING_ACTIONS: dict[str, dict] = {
         "monthly_before": 15.00,
         "monthly_after": 0.00,
         "confidence": "medium",
+        "proof_detail": {
+            "resource": "seat 7/12 (editor, team Acme Studio)",
+            "observations": ["Last document open: 61 days ago", "Zero comments or edits in the last 90 days", "Converted from a free trial on 2026-08-03 without an explicit upgrade"],
+            "assumptions": ["No upcoming project requires this seat"],
+            "pricing_basis": "Figma Organization per-editor seat list price",
+        },
         "risk": "Medium — confirm with the designer on the team before canceling.",
         "proof_steps": [
             "Seat unused for 61 days",
@@ -184,6 +196,12 @@ SAVING_ACTIONS: dict[str, dict] = {
         "monthly_before": 14.99,
         "monthly_after": 12.49,
         "confidence": "high",
+        "proof_detail": {
+            "resource": "license 3/8 (Pro, billed monthly)",
+            "observations": ["4.3 meetings/week average across 3 sampled months", "Peak concurrent participants: 6 (well under plan limits)"],
+            "assumptions": ["Usage stays steady quarter over quarter", "No mid-year downgrade penalty applies"],
+            "pricing_basis": "Zoom list price: $14.99 monthly vs $12.49 annual, per license/month",
+        },
         "risk": "Low — 12-month commitment; usage is steady at 4+ meetings/week.",
         "proof_steps": ["Steady weekly usage for 3 sampled months", "Annual pricing saves 16.7%"],
     },
@@ -194,6 +212,12 @@ SAVING_ACTIONS: dict[str, dict] = {
         "monthly_before": 47.02,
         "monthly_after": 18.90,
         "confidence": "medium",
+        "proof_detail": {
+            "resource": "gpt-5-mini routing policy (classification queue only)",
+            "observations": ["82% of calls are short classification prompts (under 400 tokens)", "Cost per task rose 43% in two months while task volume fell 24%", "Classification eval-set accuracy baseline: 96.2%"],
+            "assumptions": ["Prompt-context growth is not workload growth", "Quality is re-validated on the eval set before the switch sticks"],
+            "pricing_basis": "Provider list prices per 1K tasks, sampled 2026-09-15",
+        },
         "risk": "Medium — quality must be re-validated on the classification eval set first.",
         "proof_steps": [
             "82% of calls are short classification prompts (< 400 tokens)",
