@@ -11,3 +11,88 @@
 | 2026-09-18 | CI installed mcp 2.2.0 (pinned >=1.12) | Expected: latest SDK is compatible. Actual: 2.x is a breaking major release — FastMCP server exited at boot, and the probe's discarded stderr made it undiagnosable for one CI cycle | High | Pin mcp>=1.12,<2; surface child stderr tail in probe failures | Major-version floats on a security-sensitive dependency are a reproducibility hazard; pin the line |
 | 2026-09-18 | Bind approval to an authenticated session | Expected: token->workspace registry could live inside the token's own workspace file. Actual: approve looked up the registry in the wrong file twice (anonymous workspace, then wrong lookup order) — two rounds of chicken-and-egg | Medium | Move the registry to a neutral file (data/auth-sessions.json) that is readable before any workspace is known | Identity/lookup tables must exist outside the resource they grant access to; document the resolution order |
 | 2026-09-18 | Hidden holdout generator for the benchmark | Expected: rescaling amounts preserves judgment structure. Actual: per-month random jitter on task_volume destroyed the cost-per-task drift shape one case is built on (23/24 on first run) | Medium | One scale factor per provider so trend SHAPE survives transformation | Derived-benchmark generators must transform levels, not trends — trend shape IS the label |
+
+
+## Amazon-ecosystem entries (Alexa+ track / MCP / Devpost)
+
+These follow the hackathon's friction-log template field by field.
+
+### 2026-09-19 — Alexa+ track: authorization model vs. the simulated experience
+
+- **What we tried:** Mapping the Alexa+ track's "agent acts for the user"
+  model onto SpendPilot's action loop: agent proposes, a signed mandate
+  gates execution, every refusal is logged.
+- **What worked:** The track rubric rewards exactly the shape we froze —
+  proof of human authorization, bounded scope, audit trail. Building the
+  approval as a stand-in for Alexa+ account linking (authenticated web
+  session mints a single-use HMAC mandate) kept the demo zero-credential
+  while keeping the authorization semantics real.
+- **What failed:** The first approval design let the chat surface approve
+  by self-reporting ("approver=human"). On the MCP surface that proves
+  nothing — an unauthenticated caller can claim anything. We had to
+  invert it: the MCP surface refuses approval by design; only the
+  authenticated web session can sign.
+- **What surprised us:** The refusal path became the demo's strongest
+  moment. Judges (and our own probes) trusted the system more after
+  watching it say no than after watching it execute.
+- **What we want changed:** A public Alexa+ account-linking sandbox (or
+  AP2 verifiable-credential test harness) so hackathon projects can bind
+  mandates to a real identity provider instead of an honest local stand-in.
+- **Would we use it again:** Yes — the simulate-the-surface, keep-the-
+  semantics-real approach is how we will prototype any assistant-track
+  project from now on.
+
+### 2026-09-19 — MCP protocol versioning on the Alexa+ runtime hook
+
+- **What we tried:** Serving the tool layer as MCP over Streamable HTTP,
+  negotiating protocol 2025-11-25 (the track minimum), plus an MCP Apps
+  (SEP-1865) approval card as a ui:// resource.
+- **What worked:** Pinning `mcp>=1.12,<2` and asserting the negotiated
+  protocol version in an over-the-wire probe (`tools/mcp_roundtrip.py`)
+  inside both pytest and CI — the runtime hook is proven by execution,
+  not by README.
+- **What failed:** A floating `>=` pin pulled mcp 2.2.0 in CI, where
+  `mcp.server.fastmcp` no longer exists; the server died at boot and the
+  probe's discarded stderr hid the cause for one cycle. (Also see the
+  table entries above for the proxy-502 and stderr-deadlock traps.)
+- **What surprised us:** SEP-1865 hosts disagree on what "support" means —
+  serving the resource with the right mime profile is verifiable, but
+  host-rendered appearance is not. We graded that claim unverified in
+  EVIDENCE.md rather than imply it.
+- **What we want changed:** A published protocol-compatibility matrix per
+  host (Claude / ChatGPT / Goose / Alexa+) with a reference client, so
+  "works over MCP" stops meaning "works on the one host we tried".
+- **Would we use it again:** Yes, with the pin and the wire probe from
+  day one. The 2026-07-28 MCP revision (stateless model, MCPServer
+  rename) is scheduled post-hackathon; the legacy negotiation path is a
+  safety valve, not a permanent home.
+
+### 2026-09-19 — Devpost submission flow (and the evidence behind it)
+
+- **What we tried:** Treating the submission page as a claims matrix:
+  every sentence on Devpost must bind to a runnable artifact
+  (`docs/CLAIMS.md`), and every artifact must be reproducible by a judge
+  in 5 minutes with zero credentials (`docs/JUDGE-REPRODUCTION.md`).
+- **What worked:** Writing the claims matrix BEFORE the submission text.
+  Three claims died at the matrix stage (a "hidden holdout" that was
+  really a derived invariance suite; an "independent verifier" that was
+  really a same-secret consistency check; an "independent bill
+  reconciliation" whose line items are derived by the same module) —
+  downgrading them before submission is cheaper than being caught.
+- **What failed:** Evidence files drifted stale within a day of behavior
+  changes (the e2e transcript still described the old approval model).
+  Nothing in the flow forces evidence to be re-generated when code moves;
+  we added a CI freshness gate for exactly this.
+- **What surprised us:** Demo-video scope creep. Recording early froze
+  claims we later downgraded; re-recording cost more than the matrix did.
+- **What we want changed:** A structured "evidence links" field in the
+  Devpost form (per claim, not one links blob) — it would push every team
+  toward claim-to-evidence binding.
+- **Would we use it again:** Yes. The claims-matrix-first order is now
+  our default for any judged submission.
+
+> Related follow-up (separate work order, not implemented here): the AWS
+> Builder path — an optional LLM planner layer via Bedrock + Strands on the
+> same 13 tool calls, with AgentCore as the deployment target. Its friction
+> entries land with that work order; this project references it only as
+> planned scope in README's roadmap.
