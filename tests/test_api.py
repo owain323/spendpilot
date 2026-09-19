@@ -90,6 +90,14 @@ class TestChat:
         assert any(p["canary"] for p in card["providers"])
 
 
+    def test_crossfoot_endpoint_and_intent(self, client):
+        v = client.get("/api/crossfoot").json()
+        assert v["ok"] is True and v["lines_checked"] > 0
+        res = client.post("/api/chat", json={"message": "do the numbers add up"})
+        assert res.json()["cards"][0]["type"] == "crossfoot"
+        assert res.json()["cards"][0]["ok"] is True
+
+
 class TestLedgerApi:
     def test_ledger_verify_reports_chain_ok(self, client):
         client.post("/api/chat", json={"message": "anything unusual?"})

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import re
 
-from mcp_server import actions, ledger, tools
+from mcp_server import actions, crossfoot, ledger, tools
 
 
 def _fmt_money(value: float) -> str:
@@ -149,6 +149,19 @@ def handle(message: str, session_id: str, session_token: str | None = None) -> d
         if not any(c.values()):
             reply = "No actions yet. The loop is: prove -> approve -> execute -> receipt."
         return {"reply": reply, "cards": [{"type": "mandates", **status}]}
+
+    # --- bill crossfoot (the numbers must reconcile) ------------------------
+    if any(k in text for k in ("crossfoot", "cross-foot", "do the numbers add up",
+                               "check the numbers", "reconcile")):
+        result = crossfoot.bill_crossfoot()
+        if result["ok"]:
+            reply = (f"Every number reconciles: {result['lines_checked']} line items across "
+                     f"{result['bills_checked']} bills, both rules pass. "
+                     "Quantity times unit cost equals each line, and the lines sum to each bill.")
+        else:
+            reply = (f"Reconciliation FAILED on {len(result['failures'])} check(s) - "
+                     f"details: {result['failures'][:2]}.")
+        return {"reply": reply, "cards": [{"type": "crossfoot", **result}]}
 
     # --- unit economics (the 2026 canary) ----------------------------------
     if any(k in text for k in ("unit", "per task", "per-task", "canary", "economics")):

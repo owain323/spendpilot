@@ -277,6 +277,19 @@ function cardHTML(card) {
         </ul>
       </div>`;
     }
+    case "crossfoot":
+      return `<div class="card${card.ok ? "" : " failed"}">
+        <span class="badge ${card.ok ? "ok" : "over"}">${card.ok ? "reconciled" : "FAILED"}</span>
+        <h3>Bill crossfoot</h3>
+        <ul>
+          <li>Rule 1: quantity x unit cost = line amount (every line)</li>
+          <li>Rule 2: line amounts sum to the monthly bill (every bill)</li>
+        </ul>
+        <p class="meta">${card.lines_checked} line items · ${card.bills_checked} bills ·
+          ${card.providers_checked} providers · failures: <strong>${card.failures.length}</strong></p>
+        <p class="note">Every number on this page reconciles with every other -
+        verified live, not claimed.</p>
+      </div>`;
     case "provider-detail": {
       const pts = Object.entries(card.monthly).map(([m, v]) => ({ month: m, v: v }));
       const prevVal = pts.length >= 2 ? pts[pts.length - 2].v : null;

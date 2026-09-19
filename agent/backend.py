@@ -27,7 +27,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from mcp_server import actions, ledger, store, tools
+from mcp_server import actions, crossfoot, ledger, store, tools
 
 from . import brain
 
@@ -132,6 +132,12 @@ def get_ledger(session_token: str | None = None) -> dict:
             return tools.decision_ledger()
         finally:
             store.set_workspace(None)
+
+
+@app.get("/api/crossfoot")
+def crossfoot_check() -> dict:
+    """Independent bill reconciliation - every number cross-foots or says so."""
+    return crossfoot.bill_crossfoot()
 
 
 @app.get("/api/ledger/verify")
