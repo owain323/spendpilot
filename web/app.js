@@ -494,9 +494,10 @@ function speakReply(text) {
 ttsBtn.addEventListener("click", () => {
   ttsOn = !ttsOn;
   ttsBtn.setAttribute("aria-pressed", String(ttsOn));
-  ttsBtn.textContent = ttsOn ? "🔊" : "🔇";
+  ttsBtn.classList.toggle("speaking-ready", ttsOn);
   if (!ttsOn && "speechSynthesis" in window) speechSynthesis.cancel();
 });
+ttsBtn.classList.toggle("speaking-ready", ttsOn);
 
 const micBtn = document.getElementById("mic");
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -507,9 +508,20 @@ if (SR && micBtn) {
   rec.lang = "en-US";
   rec.interimResults = false;
   rec.maxAlternatives = 1;
-  rec.onstart = () => { recognizing = true; micBtn.classList.add("listening"); };
-  rec.onend = () => { recognizing = false; micBtn.classList.remove("listening"); };
-  rec.onerror = () => { recognizing = false; micBtn.classList.remove("listening"); };
+  rec.onstart = () => {
+    recognizing = true;
+    micBtn.classList.add("listening");
+    inputEl.classList.add("listening-input");
+    inputEl.placeholder = "Listening...";
+  };
+  const recStop = () => {
+    recognizing = false;
+    micBtn.classList.remove("listening");
+    inputEl.classList.remove("listening-input");
+    inputEl.placeholder = 'Ask about this month, or say "prove the saving"';
+  };
+  rec.onend = recStop;
+  rec.onerror = recStop;
   rec.onresult = (event) => {
     const said = event.results[0][0].transcript.trim();
     if (said) { inputEl.value = said; sendBtn.click(); }

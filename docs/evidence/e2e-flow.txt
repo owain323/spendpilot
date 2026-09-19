@@ -1,25 +1,25 @@
 # End-to-end web flow evidence (JUDGE-REPRODUCTION.md criteria 1-9)
-# generated 2026-09-19T16:13:50Z by tools/e2e_flow.py — reproducible, isolated state
+# generated 2026-09-19T16:44:23Z by tools/e2e_flow.py — reproducible, isolated state
 # approval model: authenticated web session mints a single-use HMAC mandate;
 # the MCP surface refuses approval by design (see mcp-roundtrip.txt step 6)
 
-# spawning backend on 127.0.0.1:32676 (isolated state)
-## 0. authenticated session minted (workspace 4ea94a677e27)
+# spawning backend on 127.0.0.1:8378 (isolated state)
+## 0. authenticated session minted (workspace 7878d2fbf2f6)
 ## 1. agent speaks first (unprompted)
 reply: I found 3 issue(s) worth your attention this month. Proven saving potential: $128.26/mo (scenario estimates).
 cards: ['anomaly', 'anomaly', 'anomaly', 'kept']
 
 ## 2. prove the saving
 before: 181.34 after: 96.2 label: scenario estimate from sample data — not a realized saving
-proposal: p-eccb4899
+proposal: p-9aa9a562
 
 ## 3. approve -> signed mandate
-reply: Approved. I issued signed mandate m-b1c464d7 — single-use, scoped to ec2:ModifyInstanceAttribute with a hard cap of $181.34/mo, expiring at 16:28:51 UTC. Say "execute" and I will run it.
+reply: Approved. I issued signed mandate m-78563d84 — single-use, scoped to ec2:ModifyInstanceAttribute with a hard cap of $181.34/mo, expiring at 16:59:24 UTC. Say "execute" and I will run it.
 
 ## 4. execute -> receipt
-reply: Done. ec2:ModifyInstanceAttribute ran through the aws adapter (simulated), mandated by m-b1c464d7. Scenario saving: $85.14/mo. The receipt is in the ledger.
+reply: Done. ec2:ModifyInstanceAttribute ran through the aws adapter (simulated), mandated by m-78563d84. Scenario saving: $85.14/mo. The receipt is in the ledger.
 
-## 5. execute again -> refused (nothing executes twice on one mandate)
+## 5. execute again -> refused (brain level: no valid mandate remains)
 reply: I hold no valid mandate, so I will not act. Ask me to "prove the saving", then "approve" — nothing executes on trust.
 
 ## 6. set budget -> warn
@@ -30,8 +30,8 @@ reply: Welcome back. I remember our last conversation — your budgets are still
 
 ## 8. decision ledger
 ledger count: 10
-  execute - aws - Executed 'ec2:ModifyInstanceAttribute' via the aws adapter (simulated); mandate m-b1c464d7
-  approve - aws - web-session:4ea94a677e27 approved 'Rightsize the idle EC2 instance'; mandate m-b1c464d7 sc
+  execute - aws - Executed 'ec2:ModifyInstanceAttribute' via the aws adapter (simulated); mandate m-78563d84
+  approve - aws - web-session:7878d2fbf2f6 approved 'Rightsize the idle EC2 instance'; mandate m-78563d84 sc
   propose - aws - Proposed 'Rightsize the idle EC2 instance' (47.0% scenario saving, proof attached) — await
 
 ## 9. Anthropic is KEEP, never anomaly

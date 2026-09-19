@@ -1,4 +1,4 @@
-# sealed benchmark run 2026-09-19T16:13:46Z
+# sealed benchmark run 2026-09-19T16:44:20Z
 # generator: tools/refresh_evidence.py (three tiers, sealed two-phase protocol)
 
 == public regression fixtures ==

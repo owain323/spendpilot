@@ -37,11 +37,26 @@
       <main id="chat" class="chat" aria-live="polite"></main>
 
       <footer class="composer">
-        <button id="mic" class="icon-btn" type="button" title="Speak to SpendPilot" hidden>🎤</button>
+        <button id="mic" class="round-btn" type="button" title="Speak to SpendPilot" aria-label="Speak" hidden>
+          <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="21"/>
+          </svg>
+        </button>
         <input id="input" type="text" autocomplete="off"
                placeholder='Ask about this month, or say "prove the saving"'>
-        <button id="send" class="send-btn">Send</button>
-        <button id="tts" class="icon-btn" type="button" title="Read agent replies aloud" aria-pressed="false">🔊</button>
+        <button id="send" class="send-btn" type="button" aria-label="Send">
+          <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="19" x2="12" y2="6"/><polyline points="6 12 12 6 18 12"/>
+          </svg>
+        </button>
+        <button id="tts" class="round-btn" type="button" title="Read agent replies aloud" aria-pressed="false" aria-label="Toggle reply voice">
+          <svg class="i i-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 3 9 3 15 6 15 11 19 11 5"/><line x1="16" y1="9" x2="21" y2="14"/><line x1="21" y1="9" x2="16" y2="14"/>
+          </svg>
+          <svg class="i i-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 3 9 3 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+          </svg>
+        </button>
       </footer>
     </div>
 
