@@ -84,7 +84,7 @@ detect -> prove -> propose -> [human approves] -> signed mandate -> execute -> r
 - **MCP Apps native** — `propose_action` links an interactive approval card
   (`ui://spendpilot/approval-card`, `text/html;profile=mcp-app`) that hosts
   render inline; the same HTML speaks the postMessage JSON-RPC bridge.
-- **The MCP server is the product** — 13 typed tools, 122 pytest tests, a sealed
+- **The MCP server is the product** — 13 typed tools, 146 pytest tests, a sealed
   benchmark; not a thin wrapper around an existing API.
 
 ## Architecture
@@ -169,7 +169,7 @@ Judges: see [docs/JUDGE-REPRODUCTION.md](docs/JUDGE-REPRODUCTION.md) for the
 
 | Claim | Evidence |
 |---|---|
-| 100 automated tests pass (tools, ledger, store, actions, benchmark, API, MCP wire) | `docs/evidence/test-run.txt` |
+| 146 automated tests pass (tools, ledger, store, actions, planner, benchmark, API, MCP wire) | `docs/evidence/test-run.txt` |
 | Detection, three honestly-labeled tiers: public regression 12/12; independent hand-written suite 14/14 (boundary values, split verdicts, cross-rule interactions); derived invariance suite 24/24 (mechanical transformations of the public fixtures — proves invariance, NOT generalization) | `benchmarks/results/metrics.json`, `benchmarks/results/independent-metrics.json`, `benchmarks/results/derived-metrics.json` |
 | Real MCP client roundtrip: protocol 2025-11-25, 13/13 tools, action loop + ui:// resource over the wire | `docs/evidence/mcp-roundtrip.txt` |
 | End-to-end web flow (9 criteria, incl. mandate replay refusal) | `docs/evidence/e2e-flow.txt` |
