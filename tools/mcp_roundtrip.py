@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import shutil
 import socket
 import subprocess
 import sys
@@ -200,11 +201,16 @@ async def _probe(url: str, log) -> None:
 def main() -> int:
     log = print
     port = _free_port()
-    with tempfile.TemporaryDirectory() as tmp:
+    # mkdtemp + manual cleanup instead of TemporaryDirectory: on Windows the
+    # OS releases the killed server's inherited stderr handle a few hundred
+    # milliseconds after wait() returns, so an immediate rmtree races it and
+    # fails with PermissionError even though every probe step passed.
+    tmp = Path(tempfile.mkdtemp(prefix="spendpilot-roundtrip-"))
+    try:
         env = {**os.environ, "SPENDPILOT_PORT": str(port),
-               "SPENDPILOT_STATE": str(Path(tmp) / "state.json")}
+               "SPENDPILOT_STATE": str(tmp / "state.json")}
         log(f"[1/8] spawning server on 127.0.0.1:{port} (isolated state)")
-        err_path = Path(tmp) / "server-stderr.log"
+        err_path = tmp / "server-stderr.log"
         with open(err_path, "w+b") as err_file:
             proc = subprocess.Popen(
                 [sys.executable, "-m", "mcp_server.server"],
@@ -221,6 +227,15 @@ def main() -> int:
                     proc.wait(timeout=5)
                 except subprocess.TimeoutExpired:
                     proc.kill()
+    finally:
+        for _ in range(50):
+            try:
+                shutil.rmtree(tmp)
+                break
+            except PermissionError:
+                time.sleep(0.2)
+        else:
+            log(f"      warning: temp dir {tmp} still locked; left for the OS to reclaim")
     log("MCP_ROUNDTRIP_OK")
     return 0
 
