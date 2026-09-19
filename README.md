@@ -101,6 +101,8 @@ benchmarks/           two-phase evaluation (predictions sealed before gold
                       labels are opened): 12 public regression fixtures + a
                       24-case hidden holdout (labels kept out of the repo)
 docs/                 CLAIMS.md · SCOPE-FREEZE.md · JUDGE-REPRODUCTION.md · EVIDENCE.md
+                      THREAT-MODEL.md (T1-T10 threats, defense, proof pointers)
+                      PATTERNS.md (reusable modules for the next project)
 SHA256SUMS.txt        whole-repo integrity manifest
 ```
 
