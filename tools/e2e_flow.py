@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import socket
 import subprocess
 import sys
@@ -59,8 +60,12 @@ def _wait_ready(port: int, proc: subprocess.Popen, err_path: Path,
 
 def main() -> int:
     port = _free_port()
-    with tempfile.TemporaryDirectory() as tmp:
-        env = {**os.environ, "SPENDPILOT_STATE": str(Path(tmp) / "state.json"),
+    # mkdtemp + retrying cleanup instead of TemporaryDirectory: on Windows the
+    # killed backend's inherited stderr handle is released a few hundred ms
+    # after wait() returns, so an immediate rmtree races it (PermissionError).
+    tmp = Path(tempfile.mkdtemp(prefix="spendpilot-e2e-"))
+    try:
+        env = {**os.environ, "SPENDPILOT_STATE": str(tmp / "state.json"),
                "SPENDPILOT_WEB_PORT": str(port)}
         print(f"# spawning backend on 127.0.0.1:{port} (isolated state)")
         err_path = Path(tmp) / "backend-stderr.log"
@@ -171,6 +176,15 @@ def main() -> int:
                 proc.wait(timeout=5)
             except subprocess.TimeoutExpired:
                 proc.kill()
+    finally:
+        for _ in range(50):
+            try:
+                shutil.rmtree(tmp)
+                break
+            except PermissionError:
+                time.sleep(0.2)
+        else:
+            print(f"      warning: temp dir {tmp} still locked; left for the OS to reclaim")
     print("\nE2E_FLOW_OK")
     return 0
 
