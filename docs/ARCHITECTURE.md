@@ -56,7 +56,7 @@ regenerate: `python tools/make_diagrams.py`
 ### STATE lane
 
 - **State** (`store.py`) — budgets, proposals, mandates, receipts, sessions in
-  one local JSON file; atomic writes; `SPENDPILOT_STATE` env override for
+  one local JSON file; atomic writes; `SPENDLATCH_STATE` env override for
   tests.
 - **Decision ledger** (`ledger.py`) — every alert, hold, suppression, refusal,
   approval, and execution with a one-line reason. Silence is auditable.

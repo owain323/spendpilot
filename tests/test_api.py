@@ -10,7 +10,7 @@ from agent.backend import app
 
 @pytest.fixture()
 def client(tmp_path, monkeypatch):
-    monkeypatch.setenv("SPENDPILOT_STATE", str(tmp_path / "state.json"))
+    monkeypatch.setenv("SPENDLATCH_STATE", str(tmp_path / "state.json"))
     return TestClient(app)
 
 

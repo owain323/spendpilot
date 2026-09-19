@@ -184,14 +184,14 @@ Graded evidence register (what is NOT verified is marked so): [docs/EVIDENCE.md]
 - All billing data is **synthetic sample data**; no real accounts, credentials,
   or network calls to providers. Adapters are labeled `simulated: true`.
 - State lives in one local JSON file (`data/state.json`, overridable via the
-  `SPENDPILOT_STATE` env var). Nothing leaves your machine.
+  `SPENDLATCH_STATE` env var). Nothing leaves your machine.
 - The agent proposes; the human decides. Execution requires a signed,
   single-use, scope-capped, expiring mandate — and every refusal is logged.
 
 ## Roadmap (post-hackathon)
 
 - ~~Optional LLM loop~~ **Landed, off by default**: an LLM planner (Strands +
-  Bedrock, `SPENDPILOT_LLM=bedrock`) converts free-form language into a
+  Bedrock, `SPENDLATCH_LLM=bedrock`) converts free-form language into a
   structured SpendIntent — the deterministic brain routes it, policy still
   decides, and new spend is default-deny. See
   [docs/LLM-PLANNER.md](docs/LLM-PLANNER.md). Next: richer planner coverage

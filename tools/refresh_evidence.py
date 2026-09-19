@@ -70,10 +70,10 @@ def _free_port() -> int:
 def capture_handshake() -> str:
     """One real initialize POST against a spawned server, SSE frame captured."""
     port = _free_port()
-    tmp = Path(tempfile.mkdtemp(prefix="spendpilot-handshake-"))
+    tmp = Path(tempfile.mkdtemp(prefix="spendlatch-handshake-"))
     try:
-        env = {**os.environ, "SPENDPILOT_PORT": str(port),
-               "SPENDPILOT_STATE": str(tmp / "state.json")}
+        env = {**os.environ, "SPENDLATCH_PORT": str(port),
+               "SPENDLATCH_STATE": str(tmp / "state.json")}
         err_path = tmp / "server-stderr.log"
         with open(err_path, "w+b") as err_file:
             proc = subprocess.Popen(

@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 @pytest.fixture(autouse=True)
 def isolated_state(tmp_path, monkeypatch):
-    monkeypatch.setenv("SPENDPILOT_STATE", str(tmp_path / "state.json"))
+    monkeypatch.setenv("SPENDLATCH_STATE", str(tmp_path / "state.json"))
 
 
 def _executed_bundle(tmp_path) -> Path:
@@ -39,7 +39,7 @@ def _run_verify(bundle: Path, state: Path) -> subprocess.CompletedProcess:
 
 def test_full_loop_proof_verifies(tmp_path):
     bundle = _executed_bundle(tmp_path)
-    state = Path(__import__("os").environ["SPENDPILOT_STATE"])
+    state = Path(__import__("os").environ["SPENDLATCH_STATE"])
     result = _run_verify(bundle, state)
     assert result.returncode == 0, result.stdout + result.stderr
     assert result.stdout.count("✓") == 7
@@ -60,7 +60,7 @@ def test_tampered_mandate_digest_fails(tmp_path):
     bundle = json.loads(bundle_path.read_text())
     bundle["mandate_digest"] = "f" * 64
     bundle_path.write_text(json.dumps(bundle))
-    state = Path(__import__("os").environ["SPENDPILOT_STATE"])
+    state = Path(__import__("os").environ["SPENDLATCH_STATE"])
     result = _run_verify(bundle_path, state)
     assert result.returncode == 1
     assert "mandate signature" in result.stdout
@@ -72,6 +72,6 @@ def test_tampered_receipt_fails_binding(tmp_path):
     bundle["execution_receipt"]["amount"] = 9999.99
     bundle["execution_receipt"]["idempotency_key"] = "forged"
     bundle_path.write_text(json.dumps(bundle))
-    state = Path(__import__("os").environ["SPENDPILOT_STATE"])
+    state = Path(__import__("os").environ["SPENDLATCH_STATE"])
     result = _run_verify(bundle_path, state)
     assert result.returncode == 1

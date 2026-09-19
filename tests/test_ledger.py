@@ -9,7 +9,7 @@ from mcp_server import ledger, store
 
 @pytest.fixture(autouse=True)
 def isolated_state(tmp_path, monkeypatch):
-    monkeypatch.setenv("SPENDPILOT_STATE", str(tmp_path / "state.json"))
+    monkeypatch.setenv("SPENDLATCH_STATE", str(tmp_path / "state.json"))
 
 
 class TestRecord:

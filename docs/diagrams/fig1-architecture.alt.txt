@@ -1,1 +1,1 @@
-SpendPilot architecture: a web experience and MCP Apps hosts sit above one tool layer; every execution passes the mandate gate (dark node); state and decision ledger persist below; sealed benchmark and quality gates verify all.
+SpendLatch architecture: a web experience and MCP Apps hosts sit above one tool layer; every execution passes the mandate gate (dark node); state and decision ledger persist below; sealed benchmark and quality gates verify all.

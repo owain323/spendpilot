@@ -1,4 +1,4 @@
-"""spendpilot verify — offline CONSISTENCY CHECK for one exported proof bundle.
+"""spendlatch verify — offline CONSISTENCY CHECK for one exported proof bundle.
 
 Scope honesty: this is a same-secret self-verification, NOT independent
 attestation. The verifier re-derives the HMAC from the same state secret

@@ -30,7 +30,7 @@ def test_corrupt_state_fails_closed_and_preserves_file(tmp_path):
 
 
 def test_workspace_isolation(tmp_path, monkeypatch):
-    monkeypatch.delenv("SPENDPILOT_STATE", raising=False)
+    monkeypatch.delenv("SPENDLATCH_STATE", raising=False)
     monkeypatch.setattr(store, "state_path", lambda path=None: path or store.state_path())
     root = tmp_path / "data"
     monkeypatch.setattr(store, "state_path",

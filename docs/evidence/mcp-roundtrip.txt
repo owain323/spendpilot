@@ -1,13 +1,13 @@
-# MCP roundtrip 2026-09-19T17:08:22Z
+# MCP roundtrip 2026-09-19T18:06:56Z
 # generator: tools/refresh_evidence.py (tools/mcp_roundtrip.py, real client over the wire)
 
-[1/8] spawning server on 127.0.0.1:43703 (isolated state)
-      server ready in 0.8s
+[1/8] spawning server on 127.0.0.1:60205 (isolated state)
+      server ready in 1.5s
 [2/8] initialize -> protocolVersion 2025-11-25
-[3/8] tools/list -> 13 tools; propose_action links ui://spendpilot/approval-card
+[3/8] tools/list -> 13 tools; propose_action links ui://spendlatch/approval-card
 [4/8] tools/call -> read-only surface answers with valid structured content
 [5/8] state over the wire -> set_budget then budget_status agrees; error surface returns structured errors
 [6/8] action boundary -> propose carries proof_hash + challenge; unauthenticated approve refused and logged; bogus execution refused
-[7/8] MCP Apps -> ui://spendpilot/approval-card served as text/html;profile=mcp-app, bridge handshake present in HTML
+[7/8] MCP Apps -> ui://spendlatch/approval-card served as text/html;profile=mcp-app, bridge handshake present in HTML
 [8/8] decision_ledger -> propose and the unauthenticated-approve refusal recorded over the wire
 MCP_ROUNDTRIP_OK

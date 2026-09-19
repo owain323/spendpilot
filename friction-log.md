@@ -102,7 +102,7 @@ These follow the hackathon's friction-log template field by field.
 - **What we tried:** An optional LLM planner (Strands SDK + Bedrock) that
   converts free-form language into a structured SpendIntent for the
   deterministic brain to route — the LLM never approves, signs, or executes.
-- **What worked:** The OFF-by-default flag (`SPENDPILOT_LLM=bedrock`) plus
+- **What worked:** The OFF-by-default flag (`SPENDLATCH_LLM=bedrock`) plus
   lazy Strands/Bedrock imports: CI and judges run with zero AWS dependencies,
   and the 22 mocked-layer tests prove intent mapping and fallback without a
   billable call. Strands' `Agent(model=BedrockModel(...))` kept the live

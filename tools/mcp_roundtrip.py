@@ -1,6 +1,6 @@
 """MCP roundtrip probe — a REAL client over the wire, not an in-process call.
 
-Spawns the SpendPilot MCP server as a separate process, connects with the
+Spawns the SpendLatch MCP server as a separate process, connects with the
 official MCP SDK over Streamable HTTP, and exercises the full surface:
 
   1. initialize handshake (assert protocol 2025-11-25 is negotiated)
@@ -47,7 +47,7 @@ EXPECTED_TOOLS = {
     "decision_ledger",
     "propose_action", "approve_action", "execute_action", "mandate_status",
 }
-UI_RESOURCE_URI = "ui://spendpilot/approval-card"
+UI_RESOURCE_URI = "ui://spendlatch/approval-card"
 MCP_APP_MIME = "text/html;profile=mcp-app"
 
 
@@ -205,10 +205,10 @@ def main() -> int:
     # OS releases the killed server's inherited stderr handle a few hundred
     # milliseconds after wait() returns, so an immediate rmtree races it and
     # fails with PermissionError even though every probe step passed.
-    tmp = Path(tempfile.mkdtemp(prefix="spendpilot-roundtrip-"))
+    tmp = Path(tempfile.mkdtemp(prefix="spendlatch-roundtrip-"))
     try:
-        env = {**os.environ, "SPENDPILOT_PORT": str(port),
-               "SPENDPILOT_STATE": str(tmp / "state.json")}
+        env = {**os.environ, "SPENDLATCH_PORT": str(port),
+               "SPENDLATCH_STATE": str(tmp / "state.json")}
         log(f"[1/8] spawning server on 127.0.0.1:{port} (isolated state)")
         err_path = tmp / "server-stderr.log"
         with open(err_path, "w+b") as err_file:

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
-  SpendPilot approval card — an MCP App (SEP-1865, "text/html;profile=mcp-app").
+  SpendLatch approval card — an MCP App (SEP-1865, "text/html;profile=mcp-app").
 
-  Served by the MCP server as resource ui://spendpilot/approval-card and
+  Served by the MCP server as resource ui://spendlatch/approval-card and
   linked from the propose_action tool via _meta.ui.resourceUri. Hosts that
   implement MCP Apps (Claude, ChatGPT, Goose, VS Code) render this in a
   sandboxed iframe and bridge tool calls over postMessage JSON-RPC.
@@ -14,7 +14,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SpendPilot — Approval Card</title>
+<title>SpendLatch — Approval Card</title>
 <style>
   :root { color-scheme: dark; }
   * { box-sizing: border-box; margin: 0; }
@@ -162,7 +162,7 @@
   // MCP Apps handshake. No answer within 1.5s -> standalone preview mode.
   rpc("ui/initialize", {
     appCapabilities: {}, protocolVersion: "2025-11-25",
-    appInfo: { name: "spendpilot-approval-card", version: "0.3.0" }
+    appInfo: { name: "spendlatch-approval-card", version: "0.3.0" }
   }).then(function () {
     bridged = true;
     document.getElementById("status").textContent = "Connected to host.";

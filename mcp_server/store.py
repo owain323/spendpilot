@@ -42,12 +42,12 @@ DEFAULT_STATE: dict = {
     "mandate_secret": None, # per-installation HMAC key, generated on first approval
 }
 
-_ENV_KEY = "SPENDPILOT_STATE"
+_ENV_KEY = "SPENDLATCH_STATE"
 _ANONYMOUS_WORKSPACE = "anonymous"
 
 # Process-level current workspace. The web backend sets this per request
 # under its global state lock; tests and probes never touch it (they use
-# SPENDPILOT_STATE, which takes priority below).
+# SPENDLATCH_STATE, which takes priority below).
 _current_workspace: str | None = None
 
 
@@ -63,7 +63,7 @@ def current_workspace() -> str | None:
 def state_path(path: Path | None = None) -> Path:
     """Resolve the state file location.
 
-    Priority: explicit `path` argument > SPENDPILOT_STATE env (tests and
+    Priority: explicit `path` argument > SPENDLATCH_STATE env (tests and
     probes use single-file mode) > workspace file (per-session isolation).
     """
     if path is not None:
@@ -85,7 +85,7 @@ def _auth_file() -> Path:
     """The token->workspace registry. It must live OUTSIDE every workspace
     file: a request has to resolve the registry BEFORE it can know which
     workspace file to open. Single-file test mode folds it into the same
-    file (SPENDPILOT_STATE)."""
+    file (SPENDLATCH_STATE)."""
     raw = os.environ.get(_ENV_KEY)
     if raw:
         return Path(raw)

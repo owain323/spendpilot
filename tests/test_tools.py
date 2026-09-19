@@ -10,7 +10,7 @@ from mcp_server import ledger, sample_data as data, store, tools
 @pytest.fixture(autouse=True)
 def isolated_state(tmp_path, monkeypatch):
     """Every test runs against a throwaway state file."""
-    monkeypatch.setenv("SPENDPILOT_STATE", str(tmp_path / "state.json"))
+    monkeypatch.setenv("SPENDLATCH_STATE", str(tmp_path / "state.json"))
 
 
 def _provider(**overrides):
@@ -99,7 +99,7 @@ class TestAnalyzeDataset:
     def test_pure_function_writes_no_state(self, tmp_path):
         state_file = tmp_path / "state.json"
         import os
-        os.environ["SPENDPILOT_STATE"] = str(state_file)
+        os.environ["SPENDLATCH_STATE"] = str(state_file)
         tools.analyze_dataset(data.PROVIDERS, data.MONTHS)
         assert not state_file.exists()
 

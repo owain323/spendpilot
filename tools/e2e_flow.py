@@ -65,8 +65,8 @@ def main() -> int:
     # after wait() returns, so an immediate rmtree races it (PermissionError).
     tmp = Path(tempfile.mkdtemp(prefix="spendlatch-e2e-"))
     try:
-        env = {**os.environ, "SPENDPILOT_STATE": str(tmp / "state.json"),
-               "SPENDPILOT_WEB_PORT": str(port)}
+        env = {**os.environ, "SPENDLATCH_STATE": str(tmp / "state.json"),
+               "SPENDLATCH_WEB_PORT": str(port)}
         print(f"# spawning backend on 127.0.0.1:{port} (isolated state)")
         err_path = Path(tmp) / "backend-stderr.log"
         with open(err_path, "w+b") as err_file:

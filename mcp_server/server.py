@@ -50,8 +50,8 @@ mcp = FastMCP(
         "provider adapters and returns a receipt. Every decision, including "
         "holds, refusals, and executions, is recorded in a hash-chained ledger."
     ),
-    host=os.environ.get("SPENDPILOT_HOST", "127.0.0.1"),
-    port=int(os.environ.get("SPENDPILOT_PORT", "8101")),
+    host=os.environ.get("SPENDLATCH_HOST", "127.0.0.1"),
+    port=int(os.environ.get("SPENDLATCH_PORT", "8101")),
     transport_security=_TRANSPORT_SECURITY,
 )
 

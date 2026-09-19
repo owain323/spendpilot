@@ -13,7 +13,7 @@ blended into verified claims.
 | E6 | AWS-hosted deployment (Bedrock/AgentCore) | ⬜ **unverified — not claimed.** Optional bonus path, pending account access. |
 | E7 | Mandate security invariants: forged / expired / replayed / scope-drifted mandates refused, every refusal logged | ✅ verified — `tests/test_actions.py` (20 tests), `docs/evidence/mcp-roundtrip.txt` step 6 |
 | E8 | MCP Apps (SEP-1865): ui:// resource served with mcp-app mime profile, tool _meta link, bridge handshake in HTML | ✅ verified at protocol level — `docs/evidence/mcp-roundtrip.txt` step 7. Host-rendered appearance inside Claude/ChatGPT/Goose: ⬜ unverified — not claimed. |
-| E9 | LLM planner (Strands + Bedrock): SpendIntent mapping, strict-parse fallback, default-deny spend gate, zero-authority boundary | ✅ verified with a mocked Bedrock layer — `tests/test_planner.py` (22 tests). Live Bedrock calls: ⬜ unverified in CI BY DESIGN (cost) — manual smoke documented in `docs/LLM-PLANNER.md`. Feature is OFF unless `SPENDPILOT_LLM=bedrock`. |
+| E9 | LLM planner (Strands + Bedrock): SpendIntent mapping, strict-parse fallback, default-deny spend gate, zero-authority boundary | ✅ verified with a mocked Bedrock layer — `tests/test_planner.py` (22 tests). Live Bedrock calls: ⬜ unverified in CI BY DESIGN (cost) — manual smoke documented in `docs/LLM-PLANNER.md`. Feature is OFF unless `SPENDLATCH_LLM=bedrock`. |
 | E10 | Denial case card renders (Decision Console seed) | ✅ structure verified headlessly (all fields render); in-host visual parity with the approval card verified via static render. |
 
 Rule: timings and local measurements describe this one local reproduction

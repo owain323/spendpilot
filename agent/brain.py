@@ -302,7 +302,7 @@ def handle(message: str, session_id: str, session_token: str | None = None) -> d
             }
     # --- LLM planner (optional): free-form residue -> SpendIntent -----------
     # Deterministic routes get first claim on every message. Only when none
-    # of them matched AND the planner is enabled (SPENDPILOT_LLM=bedrock) do
+    # of them matched AND the planner is enabled (SPENDLATCH_LLM=bedrock) do
     # we ask the LLM to structure the sentence. The intent then re-enters
     # THIS deterministic layer: queries route like typed phrases, and spend
     # requests hit the default-deny policy gate. The LLM never approves,

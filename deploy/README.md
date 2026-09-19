@@ -18,7 +18,7 @@ is a simulated adapter and all data is synthetic.
 ## Ports
 
 - The web app defaults to `8200`, but the production host runs it on
-  **8201** (`SPENDPILOT_WEB_PORT=8201`) because another service already
+  **8201** (`SPENDLATCH_WEB_PORT=8201`) because another service already
   occupies 8200 there.
 - The MCP server listens on **8101** (`/mcp`, Streamable HTTP) in every
   environment. Keep the trailing-slash-less path: the endpoint is

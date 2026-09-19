@@ -19,8 +19,8 @@ from mcp_server import actions, planner, store, tools
 
 @pytest.fixture(autouse=True)
 def isolated_state(tmp_path, monkeypatch):
-    monkeypatch.setenv("SPENDPILOT_STATE", str(tmp_path / "state.json"))
-    monkeypatch.delenv("SPENDPILOT_LLM", raising=False)
+    monkeypatch.setenv("SPENDLATCH_STATE", str(tmp_path / "state.json"))
+    monkeypatch.delenv("SPENDLATCH_LLM", raising=False)
 
 
 def fake_llm(mapping: dict[str, object]):
@@ -103,7 +103,7 @@ class TestFeatureFlag:
 
 class TestSpendIntentPolicy:
     def _enabled_brain(self, monkeypatch, intent_dict):
-        monkeypatch.setenv("SPENDPILOT_LLM", "bedrock")
+        monkeypatch.setenv("SPENDLATCH_LLM", "bedrock")
         monkeypatch.setattr(planner, "plan",
                             lambda text, llm_fn=None: planner.parse_intent(json.dumps(intent_dict)))
 

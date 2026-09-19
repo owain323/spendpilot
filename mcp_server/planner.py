@@ -9,14 +9,14 @@ approves, never signs, never executes — the SpendIntent enters the same
 deterministic policy gate as a typed phrase, and new spend is default-deny
 (see actions.evaluate_spend_intent).
 
-OFF BY DEFAULT: the feature activates only when SPENDPILOT_LLM=bedrock.
+OFF BY DEFAULT: the feature activates only when SPENDLATCH_LLM=bedrock.
 Without it (and without AWS credentials) every test passes and the
 deterministic router handles everything. Live Bedrock calls stay out of CI.
 
 Manual smoke (real Bedrock, billed to your account):
     pip install -e ".[llm]"
-    set SPENDPILOT_LLM=bedrock            # powershell: $env:SPENDPILOT_LLM="bedrock"
-    set SPENDPILOT_BEDROCK_MODEL=...      # optional override, see MODEL_ID
+    set SPENDLATCH_LLM=bedrock            # powershell: $env:SPENDLATCH_LLM="bedrock"
+    set SPENDLATCH_BEDROCK_MODEL=...      # optional override, see MODEL_ID
     python -c "from mcp_server import planner; print(planner.plan('buy 200 dollars of API credits for the eval pipeline'))"
 """
 
@@ -29,9 +29,9 @@ from dataclasses import dataclass
 
 # Haiku-class by default: intent extraction is a structured-output task, and
 # the cheapest model that meets quality is the honest choice for a COST tool.
-# Override with SPENDPILOT_BEDROCK_MODEL (model ids are region/account
+# Override with SPENDLATCH_BEDROCK_MODEL (model ids are region/account
 # specific — verify availability in your Bedrock console before smoke runs).
-MODEL_ID = os.environ.get("SPENDPILOT_BEDROCK_MODEL",
+MODEL_ID = os.environ.get("SPENDLATCH_BEDROCK_MODEL",
                           "anthropic.claude-3-5-haiku-20241022-v1:0")
 
 # Categories the deterministic layer knows. "other" lets the model answer
@@ -71,7 +71,7 @@ class SpendIntent:
 
 def enabled() -> bool:
     """Feature flag: OFF unless explicitly opted in."""
-    return os.environ.get("SPENDPILOT_LLM") == "bedrock"
+    return os.environ.get("SPENDLATCH_LLM") == "bedrock"
 
 
 def parse_intent(raw: str) -> SpendIntent | None:

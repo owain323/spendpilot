@@ -1,6 +1,6 @@
 # LLM Planner (Strands + Bedrock) — design, boundary, smoke path
 
-**Status: landed, OFF by default.** Set `SPENDPILOT_LLM=bedrock` to enable.
+**Status: landed, OFF by default.** Set `SPENDLATCH_LLM=bedrock` to enable.
 Without the flag (and without AWS credentials) the whole product and the
 whole test suite run exactly as before — the deterministic router owns the
 conversation.
@@ -46,7 +46,7 @@ a proposal or a mandate.
 - **Haiku-class default model** (`anthropic.claude-3-5-haiku-20241022-v1:0`):
   intent extraction is structured-output work; the cheapest model that meets
   quality is the honest default for a COST tool. Override with
-  `SPENDPILOT_BEDROCK_MODEL`. Model ids are region/account specific — verify
+  `SPENDLATCH_BEDROCK_MODEL`. Model ids are region/account specific — verify
   availability in your Bedrock console before the smoke run.
 - **Lazy imports**: `strands`/`boto3` load only inside the live call path, so
   `pip install -e .` and CI carry zero AWS dependencies.
@@ -55,7 +55,7 @@ a proposal or a mandate.
 
 ```bash
 pip install -e ".[llm]"
-export SPENDPILOT_LLM=bedrock            # Windows: set SPENDPILOT_LLM=bedrock
+export SPENDLATCH_LLM=bedrock            # Windows: set SPENDLATCH_LLM=bedrock
 # AWS credentials from the environment / aws sso login
 python -c "from mcp_server import planner; \
 print(planner.plan('buy 200 dollars of API credits for the eval pipeline'))"
