@@ -114,6 +114,8 @@ benchmarks/           two-phase evaluation (predictions sealed before gold
 docs/                 CLAIMS.md · SCOPE-FREEZE.md · JUDGE-REPRODUCTION.md · EVIDENCE.md
                       THREAT-MODEL.md (T1-T10 threats, defense, proof pointers)
                       PATTERNS.md (reusable modules for the next project)
+                      LLM-PLANNER.md (optional Bedrock planner, off by default)
+                      skills/ — one page per MCP tool: activation, flow, refusals
 SHA256SUMS.txt        whole-repo integrity manifest
 ```
 
