@@ -1,1 +1,1 @@
-"""SpendPilot — agentic spending copilot for households and small teams."""
+"""SpendPilot — agentic spending copilot for AI and cloud cost teams."""

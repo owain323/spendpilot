@@ -135,7 +135,10 @@ def main() -> int:
             assert receipt["type"] == "receipt" and receipt["simulated"] is True
 
             d = post("execute", sid)
-            print("\n## 5. execute again -> refused (nothing executes twice on one mandate)")
+            # Layer note: this asserts the BRAIN-level refusal (the web path
+            # cannot reach the actions-layer "already consumed" branch - that
+            # defense is covered by test_actions.py and the MCP roundtrip).
+            print("\n## 5. execute again -> refused (brain level: no valid mandate remains)")
             print("reply:", d["reply"])
             assert "will not act" in d["reply"] or "refused" in d["reply"].lower()
 

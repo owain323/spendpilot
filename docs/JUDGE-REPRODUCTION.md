@@ -14,7 +14,11 @@ python run_checks.py
 # PASS criteria: all tests pass; "language gate: OK"
 
 # 3. Sealed benchmark
-python benchmarks/run.py
+# three benchmark tiers (public fixtures / derived invariance suite / independent cases)
+python benchmarks/run.py              # 12 public regression fixtures
+python benchmarks/run.py --derived    # 24 derived-invariance cases (generated on first run:)
+python tools/make_derived.py          # <- regenerates benchmarks/derived/ deterministically (seeded, gitignored)
+python benchmarks/run.py --independent  # 14 hand-authored independent cases
 # PASS criteria: prints BENCHMARK_OK; results/metrics.json shows
 #   flag_precision 1.0, flag_recall 1.0 on the 12 shipped cases
 

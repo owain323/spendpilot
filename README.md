@@ -33,7 +33,7 @@ Token prices fell ~280x in two years, yet AI bills kept climbing — agents fan
 out into 10-200 metered calls per task. The bill problem is no longer per-token
 price; it is **usage patterns and unit economics**. SpendPilot watches cost per
 task (the canary), not just total spend (the smoke alarm) — and it does the same
-for the rest of the household stack: cloud, SaaS seats, trials, subscriptions.
+for the rest of the team's stack: cloud, SaaS seats, trials, subscriptions.
 
 And in 2026 the bar for agents moved again: agentic-payment protocols (AP2,
 ACP, x402) all converged on the same shape — an agent that touches money must
@@ -84,7 +84,7 @@ detect -> prove -> propose -> [human approves] -> signed mandate -> execute -> r
 - **MCP Apps native** — `propose_action` links an interactive approval card
   (`ui://spendpilot/approval-card`, `text/html;profile=mcp-app`) that hosts
   render inline; the same HTML speaks the postMessage JSON-RPC bridge.
-- **The MCP server is the product** — 13 typed tools, 100 tests, a sealed
+- **The MCP server is the product** — 13 typed tools, 122 pytest tests, a sealed
   benchmark; not a thin wrapper around an existing API.
 
 ## Architecture

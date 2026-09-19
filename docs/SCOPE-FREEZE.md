@@ -12,7 +12,7 @@ Detection classes (5):
 4. Zombie subscription (unused >= 45 days while billing)
 5. Cost-per-task drift for AI API providers (the canary metric)
 
-Tool surface (9 MCP tools): `spending_overview`, `detect_anomalies`,
+Tool surface (13 MCP tools; the original freeze listed 9 - six were added during the security and voice hardening rounds, all within the frozen mission): `spending_overview`, `detect_anomalies`,
 `simulate_saving`, `set_budget`, `budget_status`, `list_subscriptions`,
 `unit_economics`, `proactive_briefing`, `decision_ledger`.
 
