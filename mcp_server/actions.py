@@ -373,6 +373,50 @@ def export_proof(mandate_id: str, state_path: Path | None = None) -> dict:
     }
 
 
+# ------------------------------------------------------- spend-intent policy
+
+def evaluate_spend_intent(intent: dict, state_path: Path | None = None) -> dict:
+    """Policy gate for NEW spend requests parsed by the LLM planner.
+
+    Default-deny, and that is the product: the mandate system only covers
+    proven cost-REDUCTION actions from the saving catalog. A request to
+    spend money ("buy $200 of API credits") has no adapter, no proof, and no
+    mandate path — so the honest answer is a logged, structured DENIAL with
+    the reason, never a silent ignore and never a hallucinated execution.
+    The planner only produced the intent; this deterministic gate decides.
+    """
+    merchant = intent.get("merchant") or "unresolved merchant"
+    amount = intent.get("amount") or 0.0
+    category = intent.get("category") or "other"
+    reasons = [
+        "new spend is outside the mandate action catalog — only proven "
+        "cost-reduction actions can be proposed, approved, and executed",
+    ]
+    evidence = f"policy v{POLICY_VERSION}: default-deny for new spend"
+    # A budget line makes the denial concrete when the category has one.
+    if category != "other":
+        status = tools.budget_status(state_path)
+        row = next((b for b in status["budgets"] if b["category"] == category), None)
+        if row and amount > 0:
+            projected = row["spent"] + amount
+            verdict = "exceeds" if projected > row["monthly_limit"] else "stays within"
+            evidence = (f"{category} budget: ${row['spent']:.2f} spent + ${amount:.2f} "
+                        f"requested = ${projected:.2f} vs ${row['monthly_limit']:.2f}/mo "
+                        f"limit — {verdict}")
+            if projected > row["monthly_limit"]:
+                reasons.append(
+                    f"the {category} budget would be exceeded ({evidence})")
+    entry = ledger.record(
+        "refuse", merchant,
+        f"DENIED new spend of ${amount:.2f} ({category})"
+        + (f" for {intent['scope']}" if intent.get("scope") else "")
+        + f": {reasons[0]}",
+        evidence=[evidence], path=state_path)
+    return {"decision": "DENIED", "reasons": reasons, "evidence": evidence,
+            "policy_limit": "mandate action catalog: cost-reduction only",
+            "ledger_seq": entry["seq"]}
+
+
 # ------------------------------------------------------------------- status
 
 def mandate_status(state_path: Path | None = None) -> dict:

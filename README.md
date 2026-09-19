@@ -188,7 +188,12 @@ Graded evidence register (what is NOT verified is marked so): [docs/EVIDENCE.md]
 
 ## Roadmap (post-hackathon)
 
-- Optional LLM loop (Strands + a local model) layered on the same tool calls
+- ~~Optional LLM loop~~ **Landed, off by default**: an LLM planner (Strands +
+  Bedrock, `SPENDPILOT_LLM=bedrock`) converts free-form language into a
+  structured SpendIntent — the deterministic brain routes it, policy still
+  decides, and new spend is default-deny. See
+  [docs/LLM-PLANNER.md](docs/LLM-PLANNER.md). Next: richer planner coverage
+  and AgentCore deployment.
 - Import real usage snapshots (CSV / provider exports) behind an explicit,
   local-only ingest path
 - Production mandate signing bound to device keys / AP2 verifiable credentials,

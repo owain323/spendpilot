@@ -96,3 +96,34 @@ These follow the hackathon's friction-log template field by field.
 > same 13 tool calls, with AgentCore as the deployment target. Its friction
 > entries land with that work order; this project references it only as
 > planned scope in README's roadmap.
+
+### 2026-09-19 — AWS Builder path: Strands + Bedrock LLM planner
+
+- **What we tried:** An optional LLM planner (Strands SDK + Bedrock) that
+  converts free-form language into a structured SpendIntent for the
+  deterministic brain to route — the LLM never approves, signs, or executes.
+- **What worked:** The OFF-by-default flag (`SPENDPILOT_LLM=bedrock`) plus
+  lazy Strands/Bedrock imports: CI and judges run with zero AWS dependencies,
+  and the 22 mocked-layer tests prove intent mapping and fallback without a
+  billable call. Strands' `Agent(model=BedrockModel(...))` kept the live
+  path to three lines.
+- **What failed:** Structured-output discipline was the whole game. The
+  model will eventually emit fenced JSON, prose around the JSON, stringly
+  amounts, or a key you never asked for (our mock suite includes an
+  `"execute": true` smuggle attempt). Every one of those must parse to
+  "abstain and fall back" — a permissive parser here is an authority leak.
+- **What surprised us:** The most valuable planner output was a DENIAL. A
+  default-deny policy gate turned "buy $200 of API credits" into the demo's
+  clearest ten-second story: the agent understands the request perfectly and
+  still refuses, with a logged reason. Understanding without authority reads
+  as safety, not weakness.
+- **What we want changed:** Bedrock model ids are region/account-specific
+  and there is no cheap "is this model id live?" preflight short of calling
+  it — a lightweight availability check (or an alias like "sonnet-latest")
+  would make smoke instructions reproducible across accounts. Also: a
+  Strands mock client in the SDK itself; everyone writing tests currently
+  hand-rolls the fake.
+- **Would we use it again:** Yes — Strands + Bedrock is the fastest path
+  from "python function" to "managed agent loop" we have used, and the
+  pay-per-call cost model fits hackathon scale. Next step in this repo:
+  AgentCore deployment of the same planner, post-hackathon.

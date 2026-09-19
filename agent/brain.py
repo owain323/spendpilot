@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import re
 
-from mcp_server import actions, crossfoot, ledger, tools
+from mcp_server import actions, crossfoot, ledger, planner, tools
 
 
 def _fmt_money(value: float) -> str:
@@ -300,6 +300,18 @@ def handle(message: str, session_id: str, session_token: str | None = None) -> d
                 ),
                 "cards": cards,
             }
+    # --- LLM planner (optional): free-form residue -> SpendIntent -----------
+    # Deterministic routes get first claim on every message. Only when none
+    # of them matched AND the planner is enabled (SPENDPILOT_LLM=bedrock) do
+    # we ask the LLM to structure the sentence. The intent then re-enters
+    # THIS deterministic layer: queries route like typed phrases, and spend
+    # requests hit the default-deny policy gate. The LLM never approves,
+    # never signs, never executes.
+    if planner.enabled():
+        intent = planner.plan(message)
+        if intent is not None:
+            return route_intent(intent)
+
     return {
         "reply": (
             "I watch your bills across providers, prove savings before proposing them, and — "
@@ -307,6 +319,88 @@ def handle(message: str, session_id: str, session_token: str | None = None) -> d
             "Try: \"anything unusual?\", \"prove the saving\", \"approve\", \"execute\", "
             "\"cost per task\", \"set a $300 budget for home\", or \"why didn't you tell me?\""
         ),
+        "cards": [],
+    }
+
+
+def route_intent(intent) -> dict:
+    """Route a planner SpendIntent through the SAME deterministic policy as a
+    typed phrase. The planner produced data; this layer decides.
+
+    - amount > 0  -> a NEW spend request: default-deny policy gate
+      (actions.evaluate_spend_intent), rendered as a denial case card and
+      logged as a refusal. Nothing is proposed, signed, or executed.
+    - merchant resolves to a known provider, no amount -> a question about
+      that provider, answered with its trend card.
+    """
+    if intent.amount and intent.amount > 0:
+        verdict = actions.evaluate_spend_intent(intent.as_dict())
+        card = {
+            "type": "denied",
+            "agent": "llm-planner",
+            "action": "new spend",
+            "merchant": intent.merchant or "unresolved merchant",
+            "amount": intent.amount,
+            "currency": intent.currency,
+            "category": intent.category,
+            "scope": intent.scope,
+            "evidence": verdict["evidence"],
+            "policy_limit": verdict["policy_limit"],
+            "decision": verdict["decision"],
+            "reasons": verdict["reasons"],
+            "ledger_seq": verdict["ledger_seq"],
+        }
+        amount_txt = f"{_fmt_money(intent.amount)} {intent.currency}"
+        return {
+            "reply": (
+                f"I parsed that as a spend request — {amount_txt} "
+                f"for {card['merchant']}"
+                + (f" ({intent.scope})" if intent.scope else "")
+                + f". Policy decision: DENIED — {verdict['reasons'][0]}. "
+                  f"Logged as refusal #{verdict['ledger_seq']}. If this spend is "
+                  "real, the path is: I prove a saving first, you approve a "
+                  "bounded action, and only then does anything execute."
+            ),
+            "cards": [card],
+        }
+
+    merchant = (intent.merchant or "").strip().lower()
+    pid = PROVIDER_ALIASES.get(merchant)
+    if pid is None and merchant:
+        # The planner knows names the alias table does not ("Notion",
+        # "Netflix") — resolve against the provider roster itself.
+        from mcp_server import sample_data as sd
+        pid = next((p["id"] for p in sd.PROVIDERS
+                    if p["name"].lower() == merchant
+                    or merchant in p["name"].lower()), None)
+    if pid:
+        overview = tools.spending_overview()
+        line = next((p for p in overview["providers"] if p["id"] == pid), None)
+        if line:
+            from mcp_server import sample_data as sd
+            prov = next((q for q in sd.PROVIDERS if q["id"] == pid), None)
+            cards = [{"type": "overview", **overview}]
+            if prov and prov.get("monthly"):
+                cards = [{
+                    "type": "provider-detail", "id": pid, "name": line["name"],
+                    "monthly": prov["monthly"], "latest": line["amount"],
+                    "delta_pct": line.get("delta_pct"),
+                    "month": overview["month"], "prev_month": overview["prev_month"],
+                }]
+            return {
+                "reply": (
+                    f"Understood via the planner: {intent.rationale} "
+                    f"{line['name']} spent {_fmt_money(line['amount'])} in "
+                    f"{overview['month']}. Ask me to \"prove the saving\" for "
+                    "anything that looks off."
+                ),
+                "cards": cards,
+            }
+    # An intent we cannot route is abstention in disguise — deterministic fallback.
+    return {
+        "reply": (f"I structured that as: {intent.rationale} — but it does not map to "
+                  "a provider or a spend I can act on, so I am leaving it unanswered "
+                  "rather than guessing. Try \"anything unusual?\" or \"prove the saving\"."),
         "cards": [],
     }
 

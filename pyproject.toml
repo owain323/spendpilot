@@ -14,6 +14,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+llm = ["strands-agents>=0.1", "boto3>=1.35"]  # LLM planner only; never in CI
 
 [tool.setuptools]
 packages = ["mcp_server", "agent"]
