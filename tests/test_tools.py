@@ -1,4 +1,4 @@
-"""Tests for the SpendPilot tool layer (single source of truth)."""
+"""Tests for the SpendLatch tool layer (single source of truth)."""
 
 from __future__ import annotations
 

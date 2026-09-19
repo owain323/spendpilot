@@ -25,7 +25,7 @@ def test_mcp_roundtrip_over_the_wire():
     # all 13 tools must be listed over the wire
     assert "13 tools" in result.stdout
     # the MCP Apps ui:// resource must be served with the mcp-app profile
-    assert "ui://spendpilot/approval-card" in result.stdout
+    assert "ui://spendlatch/approval-card" in result.stdout
     assert "text/html;profile=mcp-app" in result.stdout
 
 

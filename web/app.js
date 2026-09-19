@@ -1,4 +1,4 @@
-/* SpendPilot web experience — simulated Alexa+ interaction model.
+/* SpendLatch web experience — simulated Alexa+ interaction model.
  * Layout: main conversation column + a standing side rail that shows the
  * action loop (detect -> prove -> propose -> approve -> execute -> receipt),
  * this month's numbers, and the decision ledger. Keyboard is the primary
@@ -18,8 +18,8 @@ const auditFiltersEl = document.getElementById("audit-filters");
 const auditChainEl = document.getElementById("audit-chain");
 const pipelineEl = document.getElementById("pipeline");
 
-const SESSION_KEY = "spendpilot.session";
-const SESSION_TOKEN_KEY = "spendpilot.sessionToken";
+const SESSION_KEY = "spendlatch.session";
+const SESSION_TOKEN_KEY = "spendlatch.sessionToken";
 const proofByProposal = {};  // proposal_id -> the proof shown to
                              // the human in this session (feeds the approval artifact)
 let sessionId = localStorage.getItem(SESSION_KEY) || null;

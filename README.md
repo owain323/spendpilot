@@ -1,8 +1,8 @@
-# SpendPilot
+# SpendLatch
 
-[![CI](https://github.com/owain323/spendpilot/actions/workflows/ci.yml/badge.svg)](https://github.com/owain323/spendpilot/actions/workflows/ci.yml)
+[![CI](https://github.com/owain323/spendlatch/actions/workflows/ci.yml/badge.svg)](https://github.com/owain323/spendlatch/actions/workflows/ci.yml)
 
-**Live demo:** https://spendpilot.owain32380.cn — the web experience and the
+**Live demo:** https://spendlatch.owain32380.cn — the web experience and the
 MCP endpoint (`/mcp`, Streamable HTTP) are both served publicly. All
 providers are simulated; no credentials exist anywhere.
 
@@ -31,14 +31,14 @@ carousels, and state that survives across sessions.
 
 Token prices fell ~280x in two years, yet AI bills kept climbing — agents fan
 out into 10-200 metered calls per task. The bill problem is no longer per-token
-price; it is **usage patterns and unit economics**. SpendPilot watches cost per
+price; it is **usage patterns and unit economics**. SpendLatch watches cost per
 task (the canary), not just total spend (the smoke alarm) — and it does the same
 for the rest of the team's stack: cloud, SaaS seats, trials, subscriptions.
 
 And in 2026 the bar for agents moved again: agentic-payment protocols (AP2,
 ACP, x402) all converged on the same shape — an agent that touches money must
 carry **proof of human authorization, bounded in scope and time, with an audit
-trail**. SpendPilot implements that shape end to end.
+trail**. SpendLatch implements that shape end to end.
 
 ## The action loop — the part most demos skip
 
@@ -82,7 +82,7 @@ detect -> prove -> propose -> [human approves] -> signed mandate -> execute -> r
   receipts, and the ledger persist server-side. Close the page, come back
   tomorrow: it remembers.
 - **MCP Apps native** — `propose_action` links an interactive approval card
-  (`ui://spendpilot/approval-card`, `text/html;profile=mcp-app`) that hosts
+  (`ui://spendlatch/approval-card`, `text/html;profile=mcp-app`) that hosts
   render inline; the same HTML speaks the postMessage JSON-RPC bridge.
 - **The MCP server is the product** — 13 typed tools, 146 pytest tests, a sealed
   benchmark; not a thin wrapper around an existing API.
@@ -97,7 +97,7 @@ agent/backend.py (FastAPI)  +  agent/brain.py (deterministic intent routing;
   │                                        LLM loop is an optional layer)
   ▼
 mcp_server/server.py — MCP over Streamable HTTP (spec 2025-11-25, 13 tools)
-  │                   + MCP Apps resource ui://spendpilot/approval-card (SEP-1865)
+  │                   + MCP Apps resource ui://spendlatch/approval-card (SEP-1865)
   ▼
 mcp_server/tools.py (pure analysis — single source of truth)
   ├── sample_data.py  synthetic multi-provider bills, 6 months + task volumes

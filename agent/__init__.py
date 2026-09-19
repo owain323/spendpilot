@@ -1,1 +1,1 @@
-"""SpendPilot agent package."""
+"""SpendLatch agent package."""

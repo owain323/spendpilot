@@ -1,14 +1,14 @@
-# Deploying SpendPilot to a public domain
+# Deploying SpendLatch to a public domain
 
 This directory contains everything needed to run the public demo on a
 single Linux VPS. The live deployment is
-`https://spendpilot.owain32380.cn`.
+`https://spendlatch.owain32380.cn`.
 
-- `spendpilot-web.service` — the FastAPI app (`python -m agent.backend`),
+- `spendlatch-web.service` — the FastAPI app (`python -m agent.backend`),
   which serves the web UI, the static assets, and the chat API.
-- `spendpilot-mcp.service` — the self-hosted MCP server
+- `spendlatch-mcp.service` — the self-hosted MCP server
   (`python -m mcp_server.server`, Streamable HTTP).
-- `nginx-spendpilot.conf` — an nginx TLS+proxy variant, kept for
+- `nginx-spendlatch.conf` — an nginx TLS+proxy variant, kept for
   deployments that do not use Caddy (see below).
 
 Both processes bind to loopback only; the reverse proxy is the only
@@ -29,13 +29,13 @@ is a simulated adapter and all data is synthetic.
 Ubuntu/TencentOS with Python >= 3.11:
 
 ```bash
-sudo useradd --system --home /opt/spendpilot --shell /usr/sbin/nologin spendpilot
-sudo mkdir -p /opt/spendpilot
+sudo useradd --system --home /opt/spendlatch --shell /usr/sbin/nologin spendlatch
+sudo mkdir -p /opt/spendlatch
 # Get the code onto the box (see section 4 for the two channels), then:
-cd /opt/spendpilot
+cd /opt/spendlatch
 sudo python3 -m venv .venv
 sudo .venv/bin/pip install -i https://mirrors.cloud.tencent.com/pypi/simple .
-sudo mkdir -p data && sudo chown -R spendpilot:spendpilot /opt/spendpilot
+sudo mkdir -p data && sudo chown -R spendlatch:spendlatch /opt/spendlatch
 ```
 
 Note: generic `pypi.org` and `github.com` were unreachable/slow from
@@ -45,10 +45,10 @@ HTTP 403 to this host.
 ## 2. systemd services
 
 ```bash
-sudo cp deploy/spendpilot-web.service deploy/spendpilot-mcp.service /etc/systemd/system/
+sudo cp deploy/spendlatch-web.service deploy/spendlatch-mcp.service /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable --now spendpilot-web spendpilot-mcp
-systemctl status spendpilot-web spendpilot-mcp --no-pager
+sudo systemctl enable --now spendlatch-web spendlatch-mcp
+systemctl status spendlatch-web spendlatch-mcp --no-pager
 ```
 
 Smoke-check from the box itself:
@@ -64,7 +64,7 @@ This VPS serves 80/443 with **Caddy**, which handles certificate
 issuance and renewal automatically. The Caddyfile block:
 
 ```caddyfile
-spendpilot.owain32380.cn {
+spendlatch.owain32380.cn {
 	import security_headers
 	import csp_inline
 	handle /mcp* {
@@ -88,7 +88,7 @@ caddy validate --config /etc/caddy/Caddyfile
 sudo systemctl restart caddy
 ```
 
-`nginx-spendpilot.conf` in this directory is the equivalent nginx
+`nginx-spendlatch.conf` in this directory is the equivalent nginx
 configuration (with certbot for certificates) if you do not run Caddy.
 
 ## 4. Getting code onto the box
@@ -98,7 +98,7 @@ configuration (with certbot for certificates) if you do not run Caddy.
   channel is a byte-identical export of the pushed commit:
 
 ```bash
-git archive HEAD | ssh <host> "tar -x -C /opt/spendpilot"
+git archive HEAD | ssh <host> "tar -x -C /opt/spendlatch"
 ```
 
 Then reinstall if dependencies changed and restart both services.
@@ -111,9 +111,9 @@ wait for it to resolve before requesting certificates.
 ## 6. Public smoke checks
 
 ```bash
-curl -fsS https://spendpilot.owain32380.cn/api/health   # {"status":"ok"}
-curl -fsS -o /dev/null -w '%{http_code}\n' https://spendpilot.owain32380.cn/
-curl -sS -X POST https://spendpilot.owain32380.cn/mcp \
+curl -fsS https://spendlatch.owain32380.cn/api/health   # {"status":"ok"}
+curl -fsS -o /dev/null -w '%{http_code}\n' https://spendlatch.owain32380.cn/
+curl -sS -X POST https://spendlatch.owain32380.cn/mcp \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json, text/event-stream' \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"smoke","version":"0"}}}'
@@ -124,7 +124,7 @@ curl -sS -X POST https://spendpilot.owain32380.cn/mcp \
 
 - **Shared demo state** — one shared instance; every visitor sees the
   same synthetic ledger (`data/state.json`). A daily
-  `systemctl restart spendpilot-web spendpilot-mcp` resets the story.
+  `systemctl restart spendlatch-web spendlatch-mcp` resets the story.
 - **No auth by design** — there is nothing to steal: simulated adapters,
   synthetic data, no outbound calls to real providers.
 - **DNS-rebinding protection stays ON** — the MCP server keeps the

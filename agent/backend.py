@@ -1,4 +1,4 @@
-"""SpendPilot agent backend — bridges the web experience to the tool layer.
+"""SpendLatch agent backend — bridges the web experience to the tool layer.
 
 Serves the simulated Alexa+ web experience and the chat API. State
 (budgets, acknowledgements, session history, decision ledger) persists in
@@ -33,7 +33,7 @@ from . import brain
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 
-app = FastAPI(title="SpendPilot", version="0.4.0")
+app = FastAPI(title="SpendLatch", version="0.4.0")
 
 
 @app.middleware("http")

@@ -1,4 +1,4 @@
-"""Synthetic multi-provider billing data for SpendPilot.
+"""Synthetic multi-provider billing data for SpendLatch.
 
 All figures are fictional sample data. Nothing here touches a real account,
 credential, or network resource.

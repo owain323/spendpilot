@@ -63,7 +63,7 @@ def main() -> int:
     # mkdtemp + retrying cleanup instead of TemporaryDirectory: on Windows the
     # killed backend's inherited stderr handle is released a few hundred ms
     # after wait() returns, so an immediate rmtree races it (PermissionError).
-    tmp = Path(tempfile.mkdtemp(prefix="spendpilot-e2e-"))
+    tmp = Path(tempfile.mkdtemp(prefix="spendlatch-e2e-"))
     try:
         env = {**os.environ, "SPENDPILOT_STATE": str(tmp / "state.json"),
                "SPENDPILOT_WEB_PORT": str(port)}

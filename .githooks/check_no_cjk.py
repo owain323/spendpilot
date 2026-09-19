@@ -1,4 +1,4 @@
-"""Fail-closed CJK guard for SpendPilot.
+"""Fail-closed CJK guard for SpendLatch.
 
 The public repository must contain zero CJK characters (Chinese, Japanese
 syllabaries, Hangul, and CJK compatibility forms). Any match fails the gate.

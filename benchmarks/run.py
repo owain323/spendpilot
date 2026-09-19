@@ -1,4 +1,4 @@
-"""Two-phase benchmark for SpendPilot's detection engine.
+"""Two-phase benchmark for SpendLatch's detection engine.
 
 Phase 1 (agent-visible): only case inputs are opened. The analysis runs and
 predictions are SEALED to results/predictions.json.

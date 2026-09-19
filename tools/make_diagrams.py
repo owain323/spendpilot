@@ -1,4 +1,4 @@
-"""Diagram generator — renders SpendPilot's three figure SVGs per the AGC
+"""Diagram generator — renders SpendLatch's three figure SVGs per the AGC
 chart spec v1.1 (800px logical canvas, 8px grid, semantic palette, evidence
 badge, source line, caption). SVG is the single master; PNG @2x is derived
 via headless Edge (see --export note in README of docs/diagrams).
@@ -148,7 +148,7 @@ def lane(s: Svg, label: str, y: float, x: float = 32) -> None:
 def figure1() -> tuple[str, str]:
     s = Svg(800, 1008)
     header(s, "One tool layer, three surfaces, one mandate gate",
-           "Source: mcp_server/, agent/, benchmarks/ — SpendPilot v0.3.0 working tree")
+           "Source: mcp_server/, agent/, benchmarks/ — SpendLatch v0.3.0 working tree")
 
     # Two strict columns: left axis x=172, right axis x=484; every inter-lane
     # edge is a straight vertical on one of the two axes (no zigzag).
@@ -211,10 +211,10 @@ def figure1() -> tuple[str, str]:
 
     s.text(400, 988, "Figure 1: One implementation, three surfaces; "
                      "the mandate gate decides what may act.", 14, GRAY, 400, "middle")
-    alt = ("SpendPilot architecture: a web experience and MCP Apps hosts sit above one "
+    alt = ("SpendLatch architecture: a web experience and MCP Apps hosts sit above one "
            "tool layer; every execution passes the mandate gate (dark node); state and "
            "decision ledger persist below; sealed benchmark and quality gates verify all.")
-    return s.render("SpendPilot architecture"), alt
+    return s.render("SpendLatch architecture"), alt
 
 
 # ---------------------------------------------------------------- figure 2

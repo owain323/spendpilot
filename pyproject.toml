@@ -1,5 +1,5 @@
 [project]
-name = "spendpilot"
+name = "spendlatch"
 version = "0.3.0"
 description = "Agentic spend-remediation copilot for AI and cloud teams: mandate-gated MCP server + simulated Alexa+ web experience"
 readme = "README.md"

@@ -1,4 +1,4 @@
-"""SpendPilot tool layer — the single source of truth for all capabilities.
+"""SpendLatch tool layer — the single source of truth for all capabilities.
 
 Every function here is pure (state side-effects go through store/ledger) and
 returns plain dicts. The MCP server wraps these as protocol tools; the local

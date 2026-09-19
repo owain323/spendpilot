@@ -1,4 +1,4 @@
-"""SpendPilot MCP server — self-hosted, Streamable HTTP transport.
+"""SpendLatch MCP server — self-hosted, Streamable HTTP transport.
 
 Implements the Model Context Protocol over Streamable HTTP as required by the
 Alexa+ track (minimum MCP spec 2025-11-25). Run:
@@ -20,7 +20,7 @@ from mcp.server.transport_security import TransportSecuritySettings
 from . import actions, tools
 
 MCP_APPS_DIR = Path(__file__).resolve().parent.parent / "web" / "mcp-apps"
-APPROVAL_CARD_URI = "ui://spendpilot/approval-card"
+APPROVAL_CARD_URI = "ui://spendlatch/approval-card"
 
 # The server binds to loopback and sits behind a reverse proxy in
 # production, which forwards the original Host (the public domain).
@@ -29,19 +29,19 @@ APPROVAL_CARD_URI = "ui://spendpilot/approval-card"
 _TRANSPORT_SECURITY = TransportSecuritySettings(
     enable_dns_rebinding_protection=True,
     allowed_hosts=[
-        "spendpilot.owain32380.cn",
+        "spendlatch.owain32380.cn",
         "127.0.0.1:*",
         "localhost:*",
     ],
     allowed_origins=[
-        "https://spendpilot.owain32380.cn",
+        "https://spendlatch.owain32380.cn",
         "http://127.0.0.1:*",
         "http://localhost:*",
     ],
 )
 
 mcp = FastMCP(
-    "spendpilot",
+    "spendlatch",
     instructions=(
         "Agentic spend-remediation copilot for AI and cloud teams. Watches "
         "multi-provider bills, proves savings before proposing them, remembers "
@@ -130,7 +130,7 @@ def decision_ledger() -> dict:
 def propose_action(action_id: str) -> dict:
     """Put a proven saving action on the table as a bounded proposal.
     Hosts that implement MCP Apps render the linked approval card
-    (ui://spendpilot/approval-card) for this tool."""
+    (ui://spendlatch/approval-card) for this tool."""
     return actions.propose_action(action_id)
 
 
@@ -169,7 +169,7 @@ def mandate_status() -> dict:
 @mcp.resource(
     APPROVAL_CARD_URI,
     name="approval-card",
-    title="SpendPilot Approval Card",
+    title="SpendLatch Approval Card",
     description="Interactive approve-and-issue-mandate card for proposed saving actions.",
     mime_type="text/html;profile=mcp-app",
     meta={"ui": {"csp": {"resourceDomains": [], "connectDomains": []}}},

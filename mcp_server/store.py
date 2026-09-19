@@ -1,4 +1,4 @@
-"""Persistent JSON state for SpendPilot.
+"""Persistent JSON state for SpendLatch.
 
 This is the cross-session memory of the product: budgets, acknowledged
 alerts, and per-session conversation bookmarks survive restarts. State

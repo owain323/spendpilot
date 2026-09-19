@@ -25,7 +25,7 @@ regenerate: `python tools/make_diagrams.py`
   evidence-chain cards, mandate and receipt cards, decision-ledger panel.
   Talks to the agent over `HTTPS /api/chat`.
 - **MCP Apps hosts** (Claude · ChatGPT · Goose) — external hosts render our
-  `ui://spendpilot/approval-card` resource inline when a tool carries the
+  `ui://spendlatch/approval-card` resource inline when a tool carries the
   `_meta.ui.resourceUri` link (SEP-1865). Verified at protocol level by the
   wire probe (step 7); host-rendered appearance is honestly marked unverified
   in `docs/EVIDENCE.md` (E8).

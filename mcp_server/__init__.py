@@ -1,1 +1,1 @@
-"""SpendPilot MCP server package."""
+"""SpendLatch MCP server package."""

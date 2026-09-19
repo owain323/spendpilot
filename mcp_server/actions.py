@@ -1,6 +1,6 @@
 """Mandate-gated action loop — the step from "watching bills" to "acting".
 
-This is SpendPilot's answer to the 2026 agentic-payments discipline (AP2 /
+This is SpendLatch's answer to the 2026 agentic-payments discipline (AP2 /
 ACP / x402 all converge on the same shape): an agent that touches money must
 carry PROOF OF HUMAN AUTHORIZATION, bounded in scope and time, and leave an
 audit trail.

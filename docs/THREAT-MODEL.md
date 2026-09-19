@@ -1,6 +1,6 @@
-# Threat Model — SpendPilot
+# Threat Model — SpendLatch
 
-Who attacks an agent that can spend? What does SpendPilot actually defend,
+Who attacks an agent that can spend? What does SpendLatch actually defend,
 and with which mechanism? This document states both, with pointers to the
 code and the tests that prove each defense.
 

@@ -1,4 +1,4 @@
-# Friction Log — SpendPilot build
+# Friction Log — SpendLatch build
 
 > Format per entry: task attempted / steps / expected vs actual / severity / workaround / actionable suggestion.
 > This log feeds the hackathon's Friction Log bonus (up to 10%).
@@ -20,7 +20,7 @@ These follow the hackathon's friction-log template field by field.
 ### 2026-09-19 — Alexa+ track: authorization model vs. the simulated experience
 
 - **What we tried:** Mapping the Alexa+ track's "agent acts for the user"
-  model onto SpendPilot's action loop: agent proposes, a signed mandate
+  model onto SpendLatch's action loop: agent proposes, a signed mandate
   gates execution, every refusal is logged.
 - **What worked:** The track rubric rewards exactly the shape we froze —
   proof of human authorization, bounded scope, audit trail. Building the

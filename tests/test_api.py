@@ -118,7 +118,7 @@ class TestStatic:
     def test_index_served(self, client):
         res = client.get("/")
         assert res.status_code == 200
-        assert "SpendPilot" in res.text
+        assert "SpendLatch" in res.text
 
     def test_health(self, client):
         assert client.get("/api/health").json() == {"status": "ok"}
