@@ -1,6 +1,6 @@
 [
   {
-    "case_id": "h01-idle-cloud-spike",
+    "case_id": "d01-idle-cloud-spike",
     "flag": [
       "spike-northstack"
     ],
@@ -11,7 +11,7 @@
     }
   },
   {
-    "case_id": "h02-idle-cloud-spike",
+    "case_id": "d02-idle-cloud-spike",
     "flag": [
       "spike-brightloop"
     ],
@@ -22,7 +22,7 @@
     }
   },
   {
-    "case_id": "h03-growth-is-value",
+    "case_id": "d03-growth-is-value",
     "flag": [],
     "keep": [
       "keep-vexohost"
@@ -33,7 +33,7 @@
     }
   },
   {
-    "case_id": "h04-growth-is-value",
+    "case_id": "d04-growth-is-value",
     "flag": [],
     "keep": [
       "keep-quanta-ai"
@@ -44,7 +44,7 @@
     }
   },
   {
-    "case_id": "h05-trial-conversion",
+    "case_id": "d05-trial-conversion",
     "flag": [
       "trial-meshpay"
     ],
@@ -55,7 +55,7 @@
     }
   },
   {
-    "case_id": "h06-trial-conversion",
+    "case_id": "d06-trial-conversion",
     "flag": [
       "trial-signalhq"
     ],
@@ -66,7 +66,7 @@
     }
   },
   {
-    "case_id": "h07-zombie",
+    "case_id": "d07-zombie",
     "flag": [
       "zombie-pinegrid"
     ],
@@ -77,7 +77,7 @@
     }
   },
   {
-    "case_id": "h08-zombie",
+    "case_id": "d08-zombie",
     "flag": [
       "zombie-orbitml"
     ],
@@ -88,7 +88,7 @@
     }
   },
   {
-    "case_id": "h09-task-drift",
+    "case_id": "d09-task-drift",
     "flag": [
       "taskdrift-cascade-io"
     ],
@@ -99,7 +99,7 @@
     }
   },
   {
-    "case_id": "h10-task-drift",
+    "case_id": "d10-task-drift",
     "flag": [
       "taskdrift-ferrodata"
     ],
@@ -110,7 +110,7 @@
     }
   },
   {
-    "case_id": "h11-insufficient-history",
+    "case_id": "d11-insufficient-history",
     "flag": [],
     "keep": [],
     "hold": [
@@ -121,7 +121,7 @@
     }
   },
   {
-    "case_id": "h12-insufficient-history",
+    "case_id": "d12-insufficient-history",
     "flag": [],
     "keep": [],
     "hold": [
@@ -132,35 +132,35 @@
     }
   },
   {
-    "case_id": "h13-small-change-no-alert",
+    "case_id": "d13-small-change-no-alert",
     "flag": [],
     "keep": [],
     "hold": [],
     "confidence": {}
   },
   {
-    "case_id": "h14-small-change-no-alert",
+    "case_id": "d14-small-change-no-alert",
     "flag": [],
     "keep": [],
     "hold": [],
     "confidence": {}
   },
   {
-    "case_id": "h15-small-dollar-spike",
+    "case_id": "d15-small-dollar-spike",
     "flag": [],
     "keep": [],
     "hold": [],
     "confidence": {}
   },
   {
-    "case_id": "h16-small-dollar-spike",
+    "case_id": "d16-small-dollar-spike",
     "flag": [],
     "keep": [],
     "hold": [],
     "confidence": {}
   },
   {
-    "case_id": "h17-multi-provider",
+    "case_id": "d17-multi-provider",
     "flag": [
       "spike-cobaltrun",
       "zombie-emberly"
@@ -173,7 +173,7 @@
     }
   },
   {
-    "case_id": "h18-multi-provider",
+    "case_id": "d18-multi-provider",
     "flag": [
       "spike-kestrel-ai",
       "zombie-palisade"
@@ -186,35 +186,35 @@
     }
   },
   {
-    "case_id": "h19-trend-not-spike",
+    "case_id": "d19-trend-not-spike",
     "flag": [],
     "keep": [],
     "hold": [],
     "confidence": {}
   },
   {
-    "case_id": "h20-trend-not-spike",
+    "case_id": "d20-trend-not-spike",
     "flag": [],
     "keep": [],
     "hold": [],
     "confidence": {}
   },
   {
-    "case_id": "h21-volume-up-cost-flat",
+    "case_id": "d21-volume-up-cost-flat",
     "flag": [],
     "keep": [],
     "hold": [],
     "confidence": {}
   },
   {
-    "case_id": "h22-volume-up-cost-flat",
+    "case_id": "d22-volume-up-cost-flat",
     "flag": [],
     "keep": [],
     "hold": [],
     "confidence": {}
   },
   {
-    "case_id": "h23-strong-spike-confidence",
+    "case_id": "d23-strong-spike-confidence",
     "flag": [
       "spike-meshpay"
     ],
@@ -225,7 +225,7 @@
     }
   },
   {
-    "case_id": "h24-strong-spike-confidence",
+    "case_id": "d24-strong-spike-confidence",
     "flag": [
       "spike-signalhq"
     ],

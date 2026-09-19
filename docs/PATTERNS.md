@@ -67,19 +67,26 @@ decision, never a silent reset.
 **Where**: `mcp_server/store.py::load_state`.
 **Tests**: `tests/test_store.py::test_corrupt_state_fails_closed_and_preserves_file`.
 
-## 5. Honest two-tier benchmark
+## 5. Honest three-tier benchmark
 
 **Problem it solves**: gold labels shipped in a public repo can only prove
 "the engine matches its own fixtures" — claiming held-out precision from
-them is a credibility killer.
+them is a credibility killer. But a generator-derived "hidden holdout"
+overclaims in the opposite direction: its decision structures are identical
+to the fixtures by construction, so it can never prove generalization.
 
-**The pattern**: two evaluation tiers —
+**The pattern**: three evaluation tiers, each named for exactly what it proves —
 1. **Public regression fixtures** (seeded, labeled, in-repo): prove the
    engine matches its regression cases. Name them exactly that.
-2. **Hidden holdout**: derived by a seeded generator from the same decision
-   structures with rescaled amounts, renamed providers, and a shifted
-   calendar. Labels are gitignored; the generator is public, so anyone can
-   reproduce the holdout — but the answers are not sitting in the tree.
+2. **Independent hand-written suite**: cases authored by hand against the
+   decision rules — threshold boundaries on both sides, split verdicts on
+   identical curves, cross-rule interactions. Not generator output. Labels
+   are public; the honesty comes from the authoring trail (each case note
+   states the decision structure it isolates), not from secrecy.
+3. **Derived invariance suite**: mechanical rescale/rename/time-shift of
+   the public fixtures by a seeded generator; labels gitignored so anyone
+   can reproduce the cases but the answers are not sitting in the tree.
+   Presented strictly as INVARIANCE evidence — never as generalization.
    Aggregate metrics are published; per-case labels are not.
 
 **Transformation discipline**: perturb LEVELS, never trend SHAPES — a
@@ -87,8 +94,9 @@ per-month jitter on task volume destroys the cost-per-task drift one case
 is built on (this bit us: first run was 23/24, the miss was pure generator
 bug, and it was worth catching).
 
-**Where**: `tools/make_holdout.py`, `benchmarks/run.py --holdout`,
-`.gitignore` (`benchmarks/hidden/`), `docs/evidence/holdout-metrics.json`.
+**Where**: `benchmarks/run.py` (default / `--independent` / `--derived`),
+`tools/make_derived.py`, `.gitignore` (`benchmarks/derived/`),
+`docs/evidence/independent-metrics.json`, `docs/evidence/derived-metrics.json`.
 
 ## Probe discipline (applies to all of the above)
 

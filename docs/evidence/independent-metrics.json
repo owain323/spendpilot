@@ -1,0 +1,126 @@
+{
+  "cases": 14,
+  "flag_precision": 1.0,
+  "flag_recall": 1.0,
+  "flag_tp": 10,
+  "flag_fp": 0,
+  "flag_fn": 0,
+  "keep_accuracy": 1.0,
+  "hold_accuracy": 1.0,
+  "cases_fully_correct": 14,
+  "per_case": [
+    {
+      "case_id": "i01-zombie-at-threshold",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "i02-zombie-below-threshold",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "i03-history-boundary-spike",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "i04-pct-exact-25",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "i05-abs-alone-insufficient",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "i06-keep-but-unit-cost-inflating",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "i07-unit-drift-volume-up",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "i08-trial-active-user",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "i09-spend-collapse-silent",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "i10-restart-after-pause",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "i11-identical-curves-split-verdict",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "i12-zombie-minimal-history",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "i13-taskdrift-at-threshold",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    },
+    {
+      "case_id": "i14-zombie-declining-bill",
+      "flag_ok": true,
+      "keep_ok": true,
+      "hold_ok": true,
+      "extra_flags": [],
+      "missed_flags": []
+    }
+  ],
+  "basis": "independent hand-written suite: cases authored by hand against the decision rules (threshold boundaries, split verdicts, cross-rule interactions); not generator output; labels public in benchmarks/gold/"
+}

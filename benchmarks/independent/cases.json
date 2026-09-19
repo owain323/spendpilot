@@ -1,0 +1,138 @@
+{
+  "months": ["2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06"],
+  "cases": [
+    {
+      "id": "i01-zombie-at-threshold",
+      "note": "hand-written: last_used exactly 45 days - the zombie threshold is inclusive",
+      "providers": [
+        {"id": "cachetier", "name": "CacheTier", "category": "saas",
+         "monthly": {"2026-01": 25.0, "2026-02": 25.0, "2026-03": 25.0, "2026-04": 25.0, "2026-05": 25.0, "2026-06": 25.0},
+         "evidence": {"driver": "seats", "detail": "seat unused since the migration", "last_used_days": 45, "usage_matches_value": true}}
+      ]
+    },
+    {
+      "id": "i02-zombie-below-threshold",
+      "note": "hand-written: last_used 44 days - one day under the threshold, silence is correct",
+      "providers": [
+        {"id": "polishkit", "name": "PolishKit", "category": "saas",
+         "monthly": {"2026-01": 18.0, "2026-02": 18.0, "2026-03": 18.0, "2026-04": 18.0, "2026-05": 18.0, "2026-06": 18.0},
+         "evidence": {"driver": "seats", "detail": "used six weeks ago", "last_used_days": 44, "usage_matches_value": true}}
+      ]
+    },
+    {
+      "id": "i03-history-boundary-spike",
+      "note": "hand-written: exactly 3 months of history (the eligibility floor) WITH a real spike - must judge, not refuse",
+      "providers": [
+        {"id": "gpufleet", "name": "GpuFleet", "category": "cloud",
+         "monthly": {"2026-04": 100.0, "2026-05": 100.0, "2026-06": 130.0},
+         "evidence": {"driver": "gpu", "detail": "training nodes idle since the run ended", "usage_matches_value": false}}
+      ]
+    },
+    {
+      "id": "i04-pct-exact-25",
+      "note": "hand-written: +25.0% exactly (pct threshold inclusive) with abs comfortably over - must flag",
+      "providers": [
+        {"id": "vectorbase", "name": "VectorBase", "category": "cloud",
+         "monthly": {"2026-01": 100.0, "2026-02": 100.0, "2026-03": 100.0, "2026-04": 100.0, "2026-05": 100.0, "2026-06": 125.0},
+         "evidence": {"driver": "storage", "detail": "index storage growing while query rate is flat", "usage_matches_value": false}}
+      ]
+    },
+    {
+      "id": "i05-abs-alone-insufficient",
+      "note": "hand-written: +$20.00 meets the absolute floor but +5% misses the pct bar - BOTH gates are required, silence is correct",
+      "providers": [
+        {"id": "datawhouse", "name": "DataWhouse", "category": "cloud",
+         "monthly": {"2026-01": 400.0, "2026-02": 400.0, "2026-03": 400.0, "2026-04": 400.0, "2026-05": 400.0, "2026-06": 420.0},
+         "evidence": {"driver": "compute", "detail": "query volume up seasonally", "last_used_days": 2, "usage_matches_value": true}}
+      ]
+    },
+    {
+      "id": "i06-keep-but-unit-cost-inflating",
+      "note": "hand-written: growth tracks real usage (keep) BUT flat task volume means cost per task inflated +35% - the engine must keep the provider AND fire the unit-economics canary",
+      "providers": [
+        {"id": "llmgateway", "name": "LlmGateway", "category": "ai-api",
+         "monthly": {"2026-01": 100.0, "2026-02": 100.0, "2026-03": 100.0, "2026-04": 100.0, "2026-05": 100.0, "2026-06": 135.0},
+         "task_volume": {"2026-01": 10000, "2026-02": 10000, "2026-03": 10000, "2026-04": 10000, "2026-05": 10000, "2026-06": 10000},
+         "evidence": {"driver": "tokens", "detail": "same workload, price per call went up", "usage_matches_value": true}}
+      ]
+    },
+    {
+      "id": "i07-unit-drift-volume-up",
+      "note": "hand-written: cost per task +18% MoM while volume RISES - a price-hike canary, not context bloat; below the spike pct bar so only the canary fires",
+      "providers": [
+        {"id": "modelrouter", "name": "ModelRouter", "category": "ai-api",
+         "monthly": {"2026-01": 100.0, "2026-02": 100.0, "2026-03": 100.0, "2026-04": 100.0, "2026-05": 100.0, "2026-06": 124.0},
+         "task_volume": {"2026-01": 10000, "2026-02": 10000, "2026-03": 10000, "2026-04": 10000, "2026-05": 10000, "2026-06": 10500},
+         "evidence": {"driver": "tokens", "detail": "vendor re-priced the mid tier", "usage_matches_value": true}}
+      ]
+    },
+    {
+      "id": "i08-trial-active-user",
+      "note": "hand-written: trial converted to paid but the user is ACTIVE (10d) - the conversion itself is the finding, no zombie signal exists",
+      "providers": [
+        {"id": "evalharness", "name": "EvalHarness", "category": "saas",
+         "monthly": {"2026-01": 0.0, "2026-02": 0.0, "2026-03": 0.0, "2026-04": 0.0, "2026-05": 0.0, "2026-06": 14.0},
+         "evidence": {"driver": "trial_conversion", "detail": "trial ended 2026-06-01, auto-converted to paid", "trial_end": "2026-06-01", "last_used_days": 10, "usage_matches_value": false}}
+      ]
+    },
+    {
+      "id": "i09-spend-collapse-silent",
+      "note": "hand-written: bill collapses -60% - the engine alerts on waste risk, never on savings; silence is correct",
+      "providers": [
+        {"id": "notebookhub", "name": "NotebookHub", "category": "cloud",
+         "monthly": {"2026-01": 100.0, "2026-02": 100.0, "2026-03": 100.0, "2026-04": 100.0, "2026-05": 100.0, "2026-06": 40.0},
+         "evidence": {"driver": "compute", "detail": "team moved to spot instances", "last_used_days": 2, "usage_matches_value": true}}
+      ]
+    },
+    {
+      "id": "i10-restart-after-pause",
+      "note": "hand-written: $0 month then billing resumes - no prior-month baseline means no spike judgment; silence is correct",
+      "providers": [
+        {"id": "queuebus", "name": "QueueBus", "category": "cloud",
+         "monthly": {"2026-01": 60.0, "2026-02": 60.0, "2026-03": 60.0, "2026-04": 60.0, "2026-05": 0.0, "2026-06": 60.0},
+         "evidence": {"driver": "messages", "detail": "service paused for migration, resumed after", "last_used_days": 3, "usage_matches_value": true}}
+      ]
+    },
+    {
+      "id": "i11-identical-curves-split-verdict",
+      "note": "hand-written: two providers with IDENTICAL +40% curves - one wastes (idle render nodes), one funds real growth (volume tracks 1:1). Same numbers, opposite verdicts.",
+      "providers": [
+        {"id": "renderfarm", "name": "RenderFarm", "category": "cloud",
+         "monthly": {"2026-01": 200.0, "2026-02": 200.0, "2026-03": 200.0, "2026-04": 200.0, "2026-05": 200.0, "2026-06": 280.0},
+         "evidence": {"driver": "gpu", "detail": "render nodes idle since the project shipped", "usage_matches_value": false}},
+        {"id": "batchapi", "name": "BatchApi", "category": "ai-api",
+         "monthly": {"2026-01": 200.0, "2026-02": 200.0, "2026-03": 200.0, "2026-04": 200.0, "2026-05": 200.0, "2026-06": 280.0},
+         "task_volume": {"2026-01": 20000, "2026-02": 20000, "2026-03": 20000, "2026-04": 20000, "2026-05": 20000, "2026-06": 28000},
+         "evidence": {"driver": "tokens", "detail": "nightly batch pipeline grew with customer volume", "usage_matches_value": true}}
+      ]
+    },
+    {
+      "id": "i12-zombie-minimal-history",
+      "note": "hand-written: exactly 3 months of history (eligible) AND unused 50 days - the eligibility floor must not shield a zombie",
+      "providers": [
+        {"id": "secretsbox", "name": "SecretsBox", "category": "saas",
+         "monthly": {"2026-04": 30.0, "2026-05": 30.0, "2026-06": 30.0},
+         "evidence": {"driver": "seats", "detail": "replaced by the vault rollout", "last_used_days": 50, "usage_matches_value": true}}
+      ]
+    },
+    {
+      "id": "i13-taskdrift-at-threshold",
+      "note": "hand-written: cost per task +15.0% MoM exactly - the canary threshold is inclusive",
+      "providers": [
+        {"id": "inferencex", "name": "InferenceX", "category": "ai-api",
+         "monthly": {"2026-01": 100.0, "2026-02": 100.0, "2026-03": 100.0, "2026-04": 100.0, "2026-05": 100.0, "2026-06": 115.0},
+         "task_volume": {"2026-01": 10000, "2026-02": 10000, "2026-03": 10000, "2026-04": 10000, "2026-05": 10000, "2026-06": 10000},
+         "evidence": {"driver": "tokens", "detail": "prompt templates grew this sprint", "usage_matches_value": true}}
+      ]
+    },
+    {
+      "id": "i14-zombie-declining-bill",
+      "note": "hand-written: bill falling every month AND unused 60 days - a shrinking bill is still a zombie while it bills above $0",
+      "providers": [
+        {"id": "logvault", "name": "LogVault", "category": "saas",
+         "monthly": {"2026-01": 60.0, "2026-02": 55.0, "2026-03": 50.0, "2026-04": 45.0, "2026-05": 40.0, "2026-06": 35.0},
+         "evidence": {"driver": "seats", "detail": "team offboarded to the new observability stack", "last_used_days": 60, "usage_matches_value": true}}
+      ]
+    }
+  ]
+}

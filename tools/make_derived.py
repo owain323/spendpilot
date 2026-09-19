@@ -1,9 +1,9 @@
-"""Generate the HIDDEN holdout benchmark — labels never enter the repo.
+"""Generate the DERIVED INVARIANCE SUITE — labels never enter the repo.
 
 The public fixtures (benchmarks/cases.json) ship with their gold labels, so
-they can only ever prove "the engine matches its own regression cases". To
-honestly claim generalization, this tool derives a holdout set from the same
-decision structures but with different data surfaces:
+they can only ever prove "the engine matches its own regression cases". This
+tool derives a second surface from the SAME decision structures with
+different data surfaces:
 
   - every amount is rescaled by a seeded random factor (percent judgments
     are scale-invariant)
@@ -11,11 +11,18 @@ decision structures but with different data surfaces:
   - provider ids/names are renamed, so finding ids change
 
 The derived labels are rewritten from the original gold through the id
-mapping. The generated files land in benchmarks/hidden/ which is
+mapping. The generated files land in benchmarks/derived/ which is
 gitignored: anyone can reproduce them from this generator (seeded, fully
 deterministic), but the labels are not sitting in the public tree.
 
-Usage:  python tools/make_holdout.py [--seed 20260918]
+HONESTY NOTE — what a pass here does and does not mean: the derived cases
+share the public fixtures' decision structures BY CONSTRUCTION, so a pass
+proves the judgments are INVARIANT under rescaling, renaming, and calendar
+shifts. It is not generalization evidence. For decision structures the
+public fixtures do not cover, see the hand-written independent suite
+(benchmarks/independent/, run with benchmarks/run.py --independent).
+
+Usage:  python tools/make_derived.py [--seed 20260918]
 """
 
 from __future__ import annotations
@@ -30,7 +37,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 BENCH = ROOT / "benchmarks"
-HIDDEN = BENCH / "hidden"
+DERIVED = BENCH / "derived"
 
 NAME_POOL = [
     "northstack", "brightloop", "vexohost", "quanta-ai", "meshpay",
@@ -76,8 +83,8 @@ def derive_case(case: dict, case_gold: dict, rng: random.Random,
         return f"{kind}-{rename[old_pid]}"
 
     return (
-        {"id": f"h{seq:02d}-{case['id'].split('-', 1)[1]}",
-         "note": case["note"] + " (derived holdout)",
+        {"id": f"d{seq:02d}-{case['id'].split('-', 1)[1]}",
+         "note": case["note"] + " (derived invariance)",
          "providers": providers},
         {"flag": sorted(remap(e) for e in case_gold["flag"]),
          "keep": sorted(remap(e) for e in case_gold["keep"]),
@@ -111,12 +118,12 @@ def main() -> int:
             out_labels[new_case["id"]] = labels
             seq += 1
 
-    HIDDEN.mkdir(exist_ok=True)
-    (HIDDEN / "cases.json").write_text(
+    DERIVED.mkdir(exist_ok=True)
+    (DERIVED / "cases.json").write_text(
         json.dumps({"months": shifted_months, "cases": out_cases}, indent=2), encoding="utf-8")
-    (HIDDEN / "labels.json").write_text(
+    (DERIVED / "labels.json").write_text(
         json.dumps(out_labels, indent=2), encoding="utf-8")
-    print(f"holdout written to {HIDDEN}: {len(out_cases)} cases, seed {seed}")
+    print(f"derived invariance suite written to {DERIVED}: {len(out_cases)} cases, seed {seed}")
     return 0
 
 

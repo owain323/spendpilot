@@ -10,7 +10,7 @@
   "cases_fully_correct": 24,
   "per_case": [
     {
-      "case_id": "h01-idle-cloud-spike",
+      "case_id": "d01-idle-cloud-spike",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -18,7 +18,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h02-idle-cloud-spike",
+      "case_id": "d02-idle-cloud-spike",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -26,7 +26,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h03-growth-is-value",
+      "case_id": "d03-growth-is-value",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -34,7 +34,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h04-growth-is-value",
+      "case_id": "d04-growth-is-value",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -42,7 +42,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h05-trial-conversion",
+      "case_id": "d05-trial-conversion",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -50,7 +50,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h06-trial-conversion",
+      "case_id": "d06-trial-conversion",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -58,7 +58,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h07-zombie",
+      "case_id": "d07-zombie",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -66,7 +66,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h08-zombie",
+      "case_id": "d08-zombie",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -74,7 +74,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h09-task-drift",
+      "case_id": "d09-task-drift",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -82,7 +82,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h10-task-drift",
+      "case_id": "d10-task-drift",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -90,7 +90,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h11-insufficient-history",
+      "case_id": "d11-insufficient-history",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -98,7 +98,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h12-insufficient-history",
+      "case_id": "d12-insufficient-history",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -106,7 +106,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h13-small-change-no-alert",
+      "case_id": "d13-small-change-no-alert",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -114,7 +114,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h14-small-change-no-alert",
+      "case_id": "d14-small-change-no-alert",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -122,7 +122,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h15-small-dollar-spike",
+      "case_id": "d15-small-dollar-spike",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -130,7 +130,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h16-small-dollar-spike",
+      "case_id": "d16-small-dollar-spike",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -138,7 +138,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h17-multi-provider",
+      "case_id": "d17-multi-provider",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -146,7 +146,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h18-multi-provider",
+      "case_id": "d18-multi-provider",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -154,7 +154,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h19-trend-not-spike",
+      "case_id": "d19-trend-not-spike",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -162,7 +162,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h20-trend-not-spike",
+      "case_id": "d20-trend-not-spike",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -170,7 +170,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h21-volume-up-cost-flat",
+      "case_id": "d21-volume-up-cost-flat",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -178,7 +178,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h22-volume-up-cost-flat",
+      "case_id": "d22-volume-up-cost-flat",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -186,7 +186,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h23-strong-spike-confidence",
+      "case_id": "d23-strong-spike-confidence",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -194,7 +194,7 @@
       "missed_flags": []
     },
     {
-      "case_id": "h24-strong-spike-confidence",
+      "case_id": "d24-strong-spike-confidence",
       "flag_ok": true,
       "keep_ok": true,
       "hold_ok": true,
@@ -202,5 +202,5 @@
       "missed_flags": []
     }
   ],
-  "basis": "hidden holdout: 24 derived cases (rescaled, renamed, time-shifted from the same decision structures; seeded generator in tools/make_holdout.py; labels kept out of the repo)"
+  "basis": "derived invariance suite: 24 cases mechanically derived from the public fixtures (rescaled, renamed, time-shifted; seeded generator tools/make_derived.py; labels kept out of the repo) \u2014 proves invariance under transformation, NOT generalization"
 }

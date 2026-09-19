@@ -6,7 +6,7 @@ blended into verified claims.
 | Level | Meaning | Status |
 |---|---|---|
 | E1 | Unit/integration suite passes locally (tools, ledger, store, actions, API): 100 tests | ✅ verified — `docs/evidence/test-run.txt` |
-| E2 | Benchmarks: 12 public regression fixtures 12/12 + 24-case hidden holdout 24/24 (labels gitignored; seeded generator) | ✅ verified — `benchmarks/results/metrics.json`, `benchmarks/results/holdout-metrics.json` |
+| E2 | Benchmarks, three tiers: 12 public regression fixtures 12/12; 14 independent hand-written cases 14/14 (public labels in `benchmarks/gold/`); 24-case derived invariance suite 24/24 (labels gitignored; seeded generator; invariance proof, NOT generalization evidence) | ✅ verified — `benchmarks/results/metrics.json`, `benchmarks/results/independent-metrics.json`, `benchmarks/results/derived-metrics.json` |
 | E3 | MCP roundtrip over the wire: protocol 2025-11-25 negotiated, 13/13 tools listed and called, state persists over the wire | ✅ verified — `docs/evidence/mcp-roundtrip.txt` (runs inside pytest and the quality gate) |
 | E4 | End-to-end web flow, 9 criteria (opening → prove → approve → execute → replay refusal → budget → reopen memory → ledger → KEEP judgment) | ✅ verified — `docs/evidence/e2e-flow.txt`, reproducible via `tools/e2e_flow.py` |
 | E5 | Real provider data (bank/card/cloud APIs) | ⬜ **unverified — not claimed.** Demo uses synthetic data only. |

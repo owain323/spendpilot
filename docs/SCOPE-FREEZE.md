@@ -54,6 +54,8 @@ FIXES, not scope creep:
   and MCP workspaces are separate files) and fails closed on corruption
   (corrupt file preserved, never silently reset).
 - The ledger is hash-chained (tamper-evident).
-- Benchmarks: the 12 cases are now honestly labeled PUBLIC REGRESSION
-  FIXTURES; a 24-case hidden holdout (seeded generator, labels gitignored)
-  covers generalization. Tool count unchanged at 13.
+- Benchmarks: the 12 cases are honestly labeled PUBLIC REGRESSION
+  FIXTURES; a 14-case INDEPENDENT hand-written suite covers decision
+  structures the fixtures do not; a 24-case DERIVED INVARIANCE SUITE
+  (seeded generator, labels gitignored) proves transformation invariance
+  only — never presented as generalization evidence. Tool count unchanged at 13.

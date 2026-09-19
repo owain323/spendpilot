@@ -1,0 +1,146 @@
+[
+  {
+    "case_id": "i01-zombie-at-threshold",
+    "flag": [
+      "zombie-cachetier"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "zombie-cachetier": "low"
+    }
+  },
+  {
+    "case_id": "i02-zombie-below-threshold",
+    "flag": [],
+    "keep": [],
+    "hold": [],
+    "confidence": {}
+  },
+  {
+    "case_id": "i03-history-boundary-spike",
+    "flag": [
+      "spike-gpufleet"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "spike-gpufleet": "high"
+    }
+  },
+  {
+    "case_id": "i04-pct-exact-25",
+    "flag": [
+      "spike-vectorbase"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "spike-vectorbase": "high"
+    }
+  },
+  {
+    "case_id": "i05-abs-alone-insufficient",
+    "flag": [],
+    "keep": [],
+    "hold": [],
+    "confidence": {}
+  },
+  {
+    "case_id": "i06-keep-but-unit-cost-inflating",
+    "flag": [
+      "taskdrift-llmgateway"
+    ],
+    "keep": [
+      "keep-llmgateway"
+    ],
+    "hold": [],
+    "confidence": {
+      "keep-llmgateway": "medium",
+      "taskdrift-llmgateway": "medium"
+    }
+  },
+  {
+    "case_id": "i07-unit-drift-volume-up",
+    "flag": [
+      "taskdrift-modelrouter"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "taskdrift-modelrouter": "medium"
+    }
+  },
+  {
+    "case_id": "i08-trial-active-user",
+    "flag": [
+      "trial-evalharness"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "trial-evalharness": "low"
+    }
+  },
+  {
+    "case_id": "i09-spend-collapse-silent",
+    "flag": [],
+    "keep": [],
+    "hold": [],
+    "confidence": {}
+  },
+  {
+    "case_id": "i10-restart-after-pause",
+    "flag": [],
+    "keep": [],
+    "hold": [],
+    "confidence": {}
+  },
+  {
+    "case_id": "i11-identical-curves-split-verdict",
+    "flag": [
+      "spike-renderfarm"
+    ],
+    "keep": [
+      "keep-batchapi"
+    ],
+    "hold": [],
+    "confidence": {
+      "spike-renderfarm": "high",
+      "keep-batchapi": "high"
+    }
+  },
+  {
+    "case_id": "i12-zombie-minimal-history",
+    "flag": [
+      "zombie-secretsbox"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "zombie-secretsbox": "low"
+    }
+  },
+  {
+    "case_id": "i13-taskdrift-at-threshold",
+    "flag": [
+      "taskdrift-inferencex"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "taskdrift-inferencex": "medium"
+    }
+  },
+  {
+    "case_id": "i14-zombie-declining-bill",
+    "flag": [
+      "zombie-logvault"
+    ],
+    "keep": [],
+    "hold": [],
+    "confidence": {
+      "zombie-logvault": "low"
+    }
+  }
+]

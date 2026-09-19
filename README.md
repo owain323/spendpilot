@@ -107,8 +107,10 @@ mcp_server/tools.py (pure analysis — single source of truth)
   └── adapters.py     simulated provider adapters (aws / figma / zoom / openai)
 
 benchmarks/           two-phase evaluation (predictions sealed before gold
-                      labels are opened): 12 public regression fixtures + a
-                      24-case hidden holdout (labels kept out of the repo)
+                      labels are opened), three honestly-labeled tiers:
+                      12 public regression fixtures + 14 independent
+                      hand-written cases + a 24-case derived invariance
+                      suite (mechanical transformations, labels gitignored)
 docs/                 CLAIMS.md · SCOPE-FREEZE.md · JUDGE-REPRODUCTION.md · EVIDENCE.md
                       THREAT-MODEL.md (T1-T10 threats, defense, proof pointers)
                       PATTERNS.md (reusable modules for the next project)
@@ -166,7 +168,7 @@ Judges: see [docs/JUDGE-REPRODUCTION.md](docs/JUDGE-REPRODUCTION.md) for the
 | Claim | Evidence |
 |---|---|
 | 100 automated tests pass (tools, ledger, store, actions, benchmark, API, MCP wire) | `docs/evidence/test-run.txt` |
-| Detection: public regression 12/12 + hidden holdout 24/24 (flag P/R 1.0, keep/hold 1.0) | `benchmarks/results/metrics.json`, `benchmarks/results/holdout-metrics.json` |
+| Detection, three honestly-labeled tiers: public regression 12/12; independent hand-written suite 14/14 (boundary values, split verdicts, cross-rule interactions); derived invariance suite 24/24 (mechanical transformations of the public fixtures — proves invariance, NOT generalization) | `benchmarks/results/metrics.json`, `benchmarks/results/independent-metrics.json`, `benchmarks/results/derived-metrics.json` |
 | Real MCP client roundtrip: protocol 2025-11-25, 13/13 tools, action loop + ui:// resource over the wire | `docs/evidence/mcp-roundtrip.txt` |
 | End-to-end web flow (9 criteria, incl. mandate replay refusal) | `docs/evidence/e2e-flow.txt` |
 

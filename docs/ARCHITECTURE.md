@@ -63,9 +63,11 @@ regenerate: `python tools/make_diagrams.py`
 
 ### VERIFICATION lane
 
-- **Sealed benchmark** (`benchmarks/run.py`) — 12 held-out cases; predictions
-  written to disk before gold labels are opened. Reuses the same
-  `analyze_dataset` the product runs.
+- **Sealed benchmark** (`benchmarks/run.py`) — three honestly-labeled tiers:
+  12 public regression fixtures, 14 independent hand-written cases, and a
+  24-case derived invariance suite (mechanical transformations — invariance,
+  not generalization). Predictions written to disk before gold labels are
+  opened. Reuses the same `analyze_dataset` the product runs.
 - **Quality gates** (`run_checks.py`) — one command: pytest (100) + sealed
   benchmark + MCP wire roundtrip + SHA256 integrity + language gate.
 

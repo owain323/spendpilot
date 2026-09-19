@@ -1,0 +1,16 @@
+{
+  "i01-zombie-at-threshold": {"flag": ["zombie-cachetier"], "keep": [], "hold": []},
+  "i02-zombie-below-threshold": {"flag": [], "keep": [], "hold": []},
+  "i03-history-boundary-spike": {"flag": ["spike-gpufleet"], "keep": [], "hold": []},
+  "i04-pct-exact-25": {"flag": ["spike-vectorbase"], "keep": [], "hold": []},
+  "i05-abs-alone-insufficient": {"flag": [], "keep": [], "hold": []},
+  "i06-keep-but-unit-cost-inflating": {"flag": ["taskdrift-llmgateway"], "keep": ["keep-llmgateway"], "hold": []},
+  "i07-unit-drift-volume-up": {"flag": ["taskdrift-modelrouter"], "keep": [], "hold": []},
+  "i08-trial-active-user": {"flag": ["trial-evalharness"], "keep": [], "hold": []},
+  "i09-spend-collapse-silent": {"flag": [], "keep": [], "hold": []},
+  "i10-restart-after-pause": {"flag": [], "keep": [], "hold": []},
+  "i11-identical-curves-split-verdict": {"flag": ["spike-renderfarm"], "keep": ["keep-batchapi"], "hold": []},
+  "i12-zombie-minimal-history": {"flag": ["zombie-secretsbox"], "keep": [], "hold": []},
+  "i13-taskdrift-at-threshold": {"flag": ["taskdrift-inferencex"], "keep": [], "hold": []},
+  "i14-zombie-declining-bill": {"flag": ["zombie-logvault"], "keep": [], "hold": []}
+}
