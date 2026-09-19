@@ -220,6 +220,33 @@ function cardHTML(card) {
         <p class="note">Reply <b>"execute"</b> and the adapter runs — exactly this, once, before it expires. Without this signature, nothing moves.</p>
       </div>`;
     }
+    case "denied":
+      /* The approval artifact's dark twin: when policy DENIES, the refusal
+       * gets the same case-file treatment — who asked, what for, which
+       * policy limit, and where the refusal is logged. */
+      return `<div class="card denied">
+        <div class="denied-head">DECISION: DENIED</div>
+        <h3>${esc(card.merchant)} — ${money(card.amount)} ${esc(card.currency)}</h3>
+        <div class="kv">
+          <div><span>Agent</span><b>${esc(card.agent)}</b></div>
+          <div><span>Action</span><b>${esc(card.action)}</b></div>
+          <div><span>Merchant</span><b>${esc(card.merchant)}</b></div>
+          <div><span>Amount</span><b>${money(card.amount)} ${esc(card.currency)}</b></div>
+          ${card.scope ? `<div><span>Scope</span><b>${esc(card.scope)}</b></div>` : ""}
+          <div><span>Category</span><b>${esc(card.category)}</b></div>
+        </div>
+        <div class="auth-block denied-block">
+          <div class="auth-title">POLICY</div>
+          <div class="kv">
+            <div><span>Policy limit</span><b>${esc(card.policy_limit)}</b></div>
+            <div><span>Logged</span><b>refusal #${esc(card.ledger_seq)}</b></div>
+          </div>
+          ${(card.reasons || []).map(r => `<div class="deny-line">${esc(r)}</div>`).join("")}
+          <p class="meta mono">evidence: ${esc(card.evidence)}</p>
+        </div>
+        <p class="note">The planner understood the request; policy said no, and the
+        refusal is in the ledger. Nothing was proposed, signed, or executed.</p>
+      </div>`;
     case "receipt":
       return `<div class="card receipt">
         <span class="badge ok">executed</span>
