@@ -320,6 +320,12 @@ def _execute_locked(mandate_id: str, state_path: Path | None) -> dict:
     mandate["executed_at"] = receipt["executed_at"]
     receipt["mandate_id"] = mandate_id
     receipt["approver"] = mandate["approver"]
+    # Transaction identity: replay-safe means every execution carries its own
+    # id and a deterministic idempotency key derived from the mandate nonce.
+    receipt["request_id"] = mandate["proposal_id"]
+    receipt["execution_id"] = f"e-{secrets.token_hex(4)}"
+    receipt["idempotency_key"] = hashlib.sha256(
+        f"{mandate_id}:{mandate['nonce']}".encode()).hexdigest()[:24]
     state["receipts"].append(receipt)
     store.save_state(state, state_path)
     ledger.record(
@@ -329,6 +335,42 @@ def _execute_locked(mandate_id: str, state_path: Path | None) -> dict:
         evidence=[mandate_id, mandate["action_id"]], path=state_path,
     )
     return receipt
+
+
+# ------------------------------------------------------------ proof export
+
+POLICY_VERSION = "1.0"
+
+
+def export_proof(mandate_id: str, state_path: Path | None = None) -> dict:
+    """Export one authorization event as a self-contained proof bundle.
+
+    The bundle travels: it can be verified OFFLINE by `tools/verify_proof.py`
+    against a state file, without trusting the server that produced it.
+    Fields follow the verifiable-proof contract:
+    request / policy_version / mandate_digest / decision / approval /
+    execution_receipt / previous_ledger_hash / current_ledger_hash /
+    signer_key_id.
+    """
+    state = store.load_state(state_path)
+    mandate = state["mandates"].get(mandate_id)
+    if mandate is None:
+        return {"error": f"unknown mandate '{mandate_id}'"}
+    receipt = next((r for r in state["receipts"] if r.get("mandate_id") == mandate_id), None)
+    chain = state["ledger"]
+    last = chain[-1] if chain and "hash" in chain[-1] else {"prev_hash": None, "hash": None}
+    payload = {k: mandate[k] for k in SIGNED_FIELDS}
+    return {
+        "request": payload,
+        "policy_version": POLICY_VERSION,
+        "mandate_digest": hashlib.sha256(_canonical(mandate)).hexdigest(),
+        "decision": "APPROVED" if receipt else mandate["status"].upper(),
+        "approval": mandate["approval"],
+        "execution_receipt": receipt,
+        "previous_ledger_hash": last["prev_hash"],
+        "current_ledger_hash": last["hash"],
+        "signer_key_id": "hmac-sha256#1",
+    }
 
 
 # ------------------------------------------------------------------- status
