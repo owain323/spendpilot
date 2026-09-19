@@ -528,35 +528,85 @@ ttsBtn.classList.toggle("speaking-ready", ttsOn);
 
 const micBtn = document.getElementById("mic");
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function micHint(msg, isErr) {
+  inputEl.placeholder = msg;
+  if (isErr) {
+    inputEl.classList.add("mic-error");
+    setTimeout(() => inputEl.classList.remove("mic-error"), 3000);
+  }
+}
+
 if (SR && micBtn) {
   micBtn.hidden = false;
   let recognizing = false;
+  let meterRAF = 0;
   const rec = new SR();
   rec.lang = "en-US";
-  rec.interimResults = false;
+  rec.interimResults = true;   // live transcript: the user sees words appear
   rec.maxAlternatives = 1;
   rec.onstart = () => {
     recognizing = true;
     micBtn.classList.add("listening");
     inputEl.classList.add("listening-input");
-    inputEl.placeholder = "Listening...";
+    inputEl.value = "";
+    micHint("Listening... speak now");
   };
   const recStop = () => {
     recognizing = false;
     micBtn.classList.remove("listening");
     inputEl.classList.remove("listening-input");
+    cancelAnimationFrame(meterRAF);
+    micBtn.style.removeProperty("--level");
     inputEl.placeholder = 'Ask about this month, or say "prove the saving"';
   };
   rec.onend = recStop;
-  rec.onerror = recStop;
+  rec.onerror = (event) => {
+    recStop();
+    const why = { "not-allowed": "microphone permission denied",
+      "service-not-allowed": "speech service blocked",
+      network: "speech service unreachable (needs network)",
+      "no-speech": "no speech detected" }[event.error] || event.error;
+    micHint("Voice input unavailable: " + why, true);
+  };
   rec.onresult = (event) => {
-    const said = event.results[0][0].transcript.trim();
-    if (said) { inputEl.value = said; sendBtn.click(); }
+    const final = event.results[event.results.length - 1];
+    const said = (final.isFinal ? final[0].transcript
+      : Array.from(event.results).map(r => r[0].transcript).join(" ")).trim();
+    inputEl.value = said;
+    if (final.isFinal && said) { inputEl.classList.remove("listening-input"); sendBtn.click(); }
   };
   micBtn.addEventListener("click", () => {
     if (recognizing) { rec.stop(); return; }
-    try { rec.start(); } catch (e) { /* already started */ }
+    try {
+      rec.start();
+      // Live meter: drive the pulse scale from real microphone volume
+      // (local Web Audio, no cloud). Degrades to the CSS pulse silently.
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+          const ctx = new AudioContext();
+          const an = ctx.createAnalyser();
+          an.fftSize = 256;
+          ctx.createMediaStreamSource(stream).connect(an);
+          const buf = new Uint8Array(an.frequencyBinCount);
+          const tick = () => {
+            if (!recognizing) { stream.getTracks().forEach(t => t.stop()); ctx.close(); return; }
+            an.getByteFrequencyData(buf);
+            const level = buf.reduce((a, b) => a + b, 0) / buf.length / 255;
+            micBtn.style.setProperty("--level", level.toFixed(2));
+            meterRAF = requestAnimationFrame(tick);
+          };
+          tick();
+        }).catch(() => { /* meter is cosmetic */ });
+      }
+    } catch (e) { micHint("Could not start listening", true); }
   });
+} else if (micBtn) {
+  // No SpeechRecognition in this browser: be honest instead of silent.
+  micBtn.hidden = false;
+  micBtn.classList.add("mic-unsupported");
+  micBtn.addEventListener("click", () =>
+    micHint("Voice input needs Chrome or Edge (speech recognition unavailable here)", true));
 }
 
 document.getElementById("audit-open").addEventListener("click", () => openAudit("all"));

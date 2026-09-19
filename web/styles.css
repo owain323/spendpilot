@@ -230,11 +230,14 @@ body {
 .round-btn.listening {
   border-color: var(--over); color: var(--over);
   animation: mic-pulse 1.6s ease-out infinite;
+  transform: scale(calc(1 + var(--level, 0.2) * 0.18));
 }
 @keyframes mic-pulse {
   0% { box-shadow: 0 0 0 0 rgba(165, 39, 31, 0.35); }
   100% { box-shadow: 0 0 0 12px rgba(165, 39, 31, 0); }
 }
+input.mic-error { border-color: var(--over); }
+input.mic-error::placeholder { color: var(--over); }
 input.listening-input { border-color: var(--accent); }
 input.listening-input::placeholder { color: var(--accent); }
 .round-btn.speaking-ready .i-on { display: block; }
