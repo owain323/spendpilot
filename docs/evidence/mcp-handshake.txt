@@ -1,3 +1,5 @@
 # MCP initialize handshake over Streamable HTTP
-# POST http://127.0.0.1:8101/mcp
-data: {"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-11-25","capabilities":{"experimental":{},"prompts":{"listChanged":false},"resources":{"subscribe":false,"listChanged":false},"tools":{"listChanged":false}},"serverInfo":{"name":"spendpilot","version":"1.29.0"},"instructions":"Agentic spending copilot for households and small teams. Watches multi-provider bills, proves savings before proposing them, and remembers budgets across sessions."}}
+# captured 2026-09-19T16:13:49Z by tools/refresh_evidence.py against a spawned server (isolated state)
+
+# POST http://127.0.0.1:32670/mcp (initialize, SSE frame)
+data: {"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-11-25","capabilities":{"experimental":{},"prompts":{"listChanged":false},"resources":{"subscribe":false,"listChanged":false},"tools":{"listChanged":false}},"serverInfo":{"name":"spendpilot","version":"1.29.0"},"instructions":"Agentic spend-remediation copilot for AI and cloud teams. Watches multi-provider bills, proves savings before proposing them, remembers budgets across sessions, and — with a signed mandate issued only to an authenticated web session — executes the approved action through provider adapters and returns a receipt. Every decision, including holds, refusals, and executions, is recorded in a hash-chained ledger."}}

@@ -1,4 +1,5 @@
-"""Quality gate: tests, sealed benchmark, repo integrity, language scan.
+"""Quality gate: tests, sealed benchmark, repo integrity, evidence freshness,
+language scan.
 
 Everything that ships to the hackathon — code, comments, README — must be
 pure English. One stray CJK character fails the gate.
@@ -59,6 +60,7 @@ def main() -> int:
         ("sealed benchmark", [sys.executable, "benchmarks/run.py"]),
         ("MCP roundtrip over the wire", [sys.executable, "tools/mcp_roundtrip.py"]),
         ("integrity manifest", [sys.executable, "tools/make_sha256sums.py", "--check"]),
+        ("evidence freshness", [sys.executable, "tools/check_evidence_freshness.py"]),
     ]
     for step, argv in steps:
         if not run(step, argv):

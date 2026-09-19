@@ -21,9 +21,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
 
-      # The same five gates a judge runs locally: pytest (100 tests),
-      # sealed 12-case benchmark, MCP roundtrip over the wire (a real
-      # client against a real server subprocess), whole-repo SHA256
-      # integrity manifest, and the pure-English language scan.
+      # The same six gates a judge runs locally: pytest, sealed benchmark,
+      # MCP roundtrip over the wire (a real client against a real server
+      # subprocess), whole-repo SHA256 integrity manifest, evidence freshness
+      # (evidence must not predate the code it describes), pure-English scan.
       - name: Run all quality gates
         run: python run_checks.py

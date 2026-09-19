@@ -1,5 +1,26 @@
+# sealed benchmark run 2026-09-19T16:13:46Z
+# generator: tools/refresh_evidence.py (three tiers, sealed two-phase protocol)
+
+== public regression fixtures ==
+set: public
 cases: 12
 flag precision: 1.0  recall: 1.0
 keep accuracy: 1.0  hold accuracy: 1.0
 cases fully correct: 12/12
+BENCHMARK_OK
+
+== independent hand-written suite ==
+set: independent
+cases: 14
+flag precision: 1.0  recall: 1.0
+keep accuracy: 1.0  hold accuracy: 1.0
+cases fully correct: 14/14
+BENCHMARK_OK
+
+== derived invariance suite ==
+set: derived
+cases: 24
+flag precision: 1.0  recall: 1.0
+keep accuracy: 1.0  hold accuracy: 1.0
+cases fully correct: 24/24
 BENCHMARK_OK
