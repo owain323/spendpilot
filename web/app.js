@@ -389,6 +389,7 @@ async function send(text) {
   sessionId = data.session_id;
   localStorage.setItem(SESSION_KEY, sessionId);
   addMessage("agent", data.reply);
+  speakReply(data.reply);
   addCards(data.cards);
   updatePipeline(data.cards);
   loadLedger();
@@ -468,6 +469,55 @@ async function openAudit(filter) {
 function closeAudit() {
   auditOverlay.hidden = true;
   document.body.style.overflow = "";
+}
+
+/* ---- voice: speak to the agent, hear it answer --------------------------
+ * Progressive enhancement via the Web Speech API: the mic button only
+ * appears where SpeechRecognition exists, and TTS is a toggle. No
+ * dependency, no cloud SDK - the "simulated Alexa+ experience" gets its
+ * voice-first interaction shape from the platform itself. */
+
+const ttsBtn = document.getElementById("tts");
+let ttsOn = false;
+
+function speakReply(text) {
+  if (!ttsOn || !("speechSynthesis" in window) || !text) return;
+  try {
+    speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "en-US";
+    utter.rate = 1.02;
+    speechSynthesis.speak(utter);
+  } catch (e) { /* speech is enhancement, never load-bearing */ }
+}
+
+ttsBtn.addEventListener("click", () => {
+  ttsOn = !ttsOn;
+  ttsBtn.setAttribute("aria-pressed", String(ttsOn));
+  ttsBtn.textContent = ttsOn ? "🔊" : "🔇";
+  if (!ttsOn && "speechSynthesis" in window) speechSynthesis.cancel();
+});
+
+const micBtn = document.getElementById("mic");
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SR && micBtn) {
+  micBtn.hidden = false;
+  let recognizing = false;
+  const rec = new SR();
+  rec.lang = "en-US";
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+  rec.onstart = () => { recognizing = true; micBtn.classList.add("listening"); };
+  rec.onend = () => { recognizing = false; micBtn.classList.remove("listening"); };
+  rec.onerror = () => { recognizing = false; micBtn.classList.remove("listening"); };
+  rec.onresult = (event) => {
+    const said = event.results[0][0].transcript.trim();
+    if (said) { inputEl.value = said; sendBtn.click(); }
+  };
+  micBtn.addEventListener("click", () => {
+    if (recognizing) { rec.stop(); return; }
+    try { rec.start(); } catch (e) { /* already started */ }
+  });
 }
 
 document.getElementById("audit-open").addEventListener("click", () => openAudit("all"));

@@ -6,6 +6,15 @@
 MCP endpoint (`/mcp`, Streamable HTTP) are both served publicly. All
 providers are simulated; no credentials exist anywhere.
 
+**MCP protocol & compatibility**
+
+| | |
+|---|---|
+| Protocol | MCP 2025-11-25 (the track minimum) over Streamable HTTP |
+| SDK | mcp>=1.12,<2 - pinned: mcp-sdk 2.0.0 removed mcp.server.fastmcp (upgrade = boot failure) |
+| Verified | against our own Alexa+ integration round-trip probe (tools/mcp_roundtrip.py) |
+| Upgrade path | 2026-07-28 revision (MCPServer rename, stateless model) planned post-hackathon - the legacy negotiation path is a safety valve, not a permanent home |
+
 **An agentic spend-remediation copilot for AI and cloud teams — it watches your bills across providers, proves the next move before proposing it, and executes only inside a mandate signed by an authenticated human session. Every decision, including every refusal, is recorded.**
 
 > It doesn't wait for you to ask. It proves before it proposes. And it never moves a cent without your signed authorization.
