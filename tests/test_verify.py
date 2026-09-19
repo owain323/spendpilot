@@ -1,4 +1,4 @@
-"""Tests for the proof export + independent verifier."""
+"""Tests for the proof export + offline consistency checker."""
 
 from __future__ import annotations
 

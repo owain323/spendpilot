@@ -1,8 +1,15 @@
-"""spendpilot verify — independently verify one exported proof bundle.
+"""spendpilot verify — offline CONSISTENCY CHECK for one exported proof bundle.
 
-The point: the bundle must verify OFFLINE against a state file. The
-verifier trusts no server output; it re-derives everything from the state
-and the bundle's own bytes:
+Scope honesty: this is a same-secret self-verification, NOT independent
+attestation. The verifier re-derives the HMAC from the same state secret
+that signed the mandate, so a pass proves the bundle is internally
+consistent with the server's own records — nothing more. Third-party
+attestation (Ed25519 device keys / AP2 verifiable credentials) is a
+post-hackathon step; no key migration happens in the hackathon window.
+
+The bundle checks OFFLINE against a state file. The verifier trusts no
+server output; it re-derives everything from the state and the bundle's
+own bytes:
 
   1. request integrity        - signed payload fields present & canonical
   2. mandate signature        - HMAC re-derived from the state secret

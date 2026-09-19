@@ -5,9 +5,14 @@ accounting identities): a bill is not trusted because a report says so,
 it is trusted because its line items CROSS-FOOT —
   rule 1 (line identity):   quantity x unit_cost == line amount
   rule 2 (invoice total):   sum(line amounts) == the monthly bill
-Line items are derived deterministically from the sample ledger, and the
-verifier re-derives everything independently: it trusts no construction,
-only arithmetic. A tampered dataset fails rule 1 or rule 2 by construction.
+
+Scope honesty: the line items are DERIVED deterministically from the sample
+ledger by this same module, so a pass verifies internal consistency of
+derived line items — it is NOT independent verification against a real
+provider invoice (the residual-line construction guarantees rule 2 by
+design on well-formed input; the check earns its keep by catching tampered
+or corrupted datasets). It becomes a real verifier when real provider data
+lands (post-hackathon ingest path).
 """
 
 from __future__ import annotations
@@ -89,8 +94,9 @@ def invoice_lines(provider: dict, month: str) -> list[dict]:
 
 
 def bill_crossfoot(path: Path | None = None) -> dict[str, Any]:
-    """Independently re-derive every line and check both rules across all
-    providers and months. Reads nothing but the sample ledger and arithmetic."""
+    """Internal consistency check over derived line items: re-derive every
+    line and check both rules across all providers and months. Demo-mode
+    check on synthetic data — becomes a real verifier when real data lands."""
     failures: list[dict] = []
     lines_checked = 0
     bills_checked = 0

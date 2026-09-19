@@ -136,7 +136,7 @@ def get_ledger(session_token: str | None = None) -> dict:
 
 @app.get("/api/crossfoot")
 def crossfoot_check() -> dict:
-    """Independent bill reconciliation - every number cross-foots or says so."""
+    """Internal consistency check - derived line items cross-foot or say so."""
     return crossfoot.bill_crossfoot()
 
 

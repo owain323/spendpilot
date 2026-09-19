@@ -171,6 +171,8 @@ Judges: see [docs/JUDGE-REPRODUCTION.md](docs/JUDGE-REPRODUCTION.md) for the
 | Detection, three honestly-labeled tiers: public regression 12/12; independent hand-written suite 14/14 (boundary values, split verdicts, cross-rule interactions); derived invariance suite 24/24 (mechanical transformations of the public fixtures — proves invariance, NOT generalization) | `benchmarks/results/metrics.json`, `benchmarks/results/independent-metrics.json`, `benchmarks/results/derived-metrics.json` |
 | Real MCP client roundtrip: protocol 2025-11-25, 13/13 tools, action loop + ui:// resource over the wire | `docs/evidence/mcp-roundtrip.txt` |
 | End-to-end web flow (9 criteria, incl. mandate replay refusal) | `docs/evidence/e2e-flow.txt` |
+| Proof bundle export + offline consistency check (7 checks over the bundle vs. the state file; same-secret self-verification — NOT independent attestation) | `tools/verify_proof.py`, `tests/test_verify.py` |
+| Bill crossfoot: derived line items, internal consistency verified (demo-mode check on synthetic data — never "independently verified") | `mcp_server/crossfoot.py`, `tests/test_crossfoot.py` |
 
 Full claim-to-evidence binding: [docs/CLAIMS.md](docs/CLAIMS.md).
 Graded evidence register (what is NOT verified is marked so): [docs/EVIDENCE.md](docs/EVIDENCE.md).
